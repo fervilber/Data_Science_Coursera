@@ -1,0 +1,155 @@
+---
+title: "chuleta_R.Rmd"
+author: "Fernando Villalba"
+date: "25 de enero de 2017"
+output: 
+  html_document: 
+    number_sections: yes
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chuleta de código R
+
+### Comandos básicos
+``` {r}
+# instalar un paquete 
+install.packages('nombre-paquete')
+
+# Cargar un paquete 
+library('nombre-paquete')
+
+# obtener la información de cabecera de los datos. las primeras filas
+head('data')
+
+# obtener las ultimas filas de una tabla de datos
+tail('data')
+
+help(topic) # documentación sobre un concepto
+
+ls() # muestra objetos de la busqueda actual
+dir() # muestra los ficheros en el dir actual
+getwd() # imprime el directorio de trabajo actual
+setwd('path/to/wherever') # establece el dirr de trabajo
+
+source("mifichero.R") # lee el fichero de código mifichero.R y ejecuta el código
+
+cat(..., file="", sep=" ") # imprime una cadena de datos u objetos en un fichero
+
+format(x, ...) # da formato para una impresion mejorada
+
+c('a',1,3,'asta') # combina objetos para formar un vector
+
+from:to # genera una secuencia
+
+list(...) # genera una lista 
+```
+
+### Acceso a datos indexados
+
+```{r}
+## Vectores 
+
+x[n] 							# get nth element
+x[-n] 							# all but the nth element
+x[1:n]							# first n elements
+x[-(1:n)]						# elements from n+1 to end
+x[c(1,2,4)]						# specific elements
+x["name"]						# element named "name"
+x[ x > 3]						# all elements of x greater than 3
+x[ x > 3 & x < 5] 				# elements between 3 and 5
+x[ x %in% c("a","and","the")]  	# elements in the given set
+
+## Listas 
+
+x[n] 							# list with elements n
+x[[n]] 							# nth element of the list
+x[["name"]] 					# element of the list named "name"
+x$name 							# id
+
+##  Matrices
+
+x[i,j] 							# element at row i, column j
+x[i,] 							# row i
+x[,j] 							# column j
+x[,c(1,3)] 						# columns 1 and 3
+x["name",] 						# row named "name"
+
+## Data frames ( lo mismo que las matices mas..)
+
+x[["name"]] 					# column named "name"
+x$name 							# id
+
+```
+
+### Conversión de variables
+```{r}
+
+as.array(x), as.data.frame(x), as.numeric(x),
+as.logical(x), as.complex(x), as.character(x),
+# ... convert type; for a complete list, use methods(as)
+
+```
+
+### Tipo o clase de variable
+```{r}
+is.na(x), is.null(x), is.array(x), is.data.frame(x),
+is.numeric(x), is.complex(x), is.character(x), ... 
+# test for type; for a complete list, use methods(is)
+
+length(x) 					# numero de elementos en x
+dim(x) 						# obtiene o establece la dimension de un objeto; dim(x) <- c(3,2)
+dimnames(x) 				# obtiene o establece la dimension de los nombres de un objeto
+nrow(x) 					# número de filas; NROW(x) is the same but treats a vector as a onerow matrix
+ncol(x) and NCOL(x) 		# id. for columnas
+class(x) 					# dice la clase del objeto x; class(x) <- "myclass"
+unclass(x) 					# quita la clase a un objeto x
+attr(x,which) 				# get or set the attribute which of x
+attributes(obj) 			# get or set the list of attributes of obj
+```
+### Selección y manipulación de datos
+
+```{r}
+which.max(x) 				# returns the index of the greatest element of x
+which.min(x) 				# returns the index of the smallest element of x
+rev(x) 						# reverses the elements of x
+sort(x) 					# sorts the elements of x in increasing order; 
+rev(sort(x))				# to sort in decreasing order
+cut(x,breaks) 				# divides x into intervals (factors); breaks is the number of cut intervals 
+							# or a vector of cut points
+match(x, y) 				# returns a vector of the same length than x with the elements of x 
+							#which are in y (NA otherwise)
+which(x == a) 				# returns a vector of the indices of x if the comparison operation 
+							# is true (TRUE), in this example the values of i for which x[i] == a 
+							# (the argument of this function must be a variable of mode logical)
+choose(n, k) 				# computes the combinations of k events among n repetitions = n!/[(n???k)!k!]
+na.omit(x) 					# suppresses the observations with missing data (NA) (suppresses the
+							# corresponding line if x is a matrix or a data frame)
+na.fail(x) 					# returns an error message if x contains at least one NA
+unique(x) 					# if x is a vector or a data frame, returns a similar object but with
+							# the duplicate elements suppressed
+table(x) 					# returns a table with the numbers of the differents values of x
+							# (typically for integers or factors)
+subset(x, ...) 				# returns a selection of x with respect to criteria (...,
+							# typically comparisons: x$V1 < 10); if x is a data frame, the option
+							# select gives the variables to be kept or dropped using a minus sign
+sample(x, size) 			# resample randomly and without replacement size elements
+							# in the vector x, the option replace = TRUE allows to resample
+							# with replacement
+prop.table(x,margin=) 		# table entries as fraction of marginal table
+```
+
+### Funciones
+```{r}
+# crear una funcion sencilla
+mifuncion<- function(){
+    x<-rnorm(100)   # genera 100 num aleatorios normal
+    mean(x)         # Calcula la media de los 100 numeros
+}
+
+
+```
+
