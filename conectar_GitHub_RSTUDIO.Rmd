@@ -2,7 +2,11 @@
 title: "conectar_GitHub_RSTUDIO"
 author: "Fernando Villalba"
 date: "25 de enero de 2017"
-output: html_document
+output: 
+  html_document: 
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -56,10 +60,9 @@ Nos aparecerá otra ventana, y allí seleccionamos Git (clonar un proyecto desde a
 Nos vamos a la web de GitHub donde esté el proyecto que queremos clonar, por ejemplo esta web, y copiamos al portapapeles la dirección (url) del proyecto.
 
 
-
 ![Copiar ruta del almacén GitHub del proyecto que queremos trabajar en local](imag/github_rstudio_03.png)
 
-Regresamos a RSTUDIO, copiamos la ruta en el apartado correspondiente y debemos introducir también la ruta y directorio final de destino del proyecto en local, por ejemplo en este caso en *C:/R/proyectos*
+Regresamos a RSTUDIO, copiamos la ruta en el apartado correspondiente y debemos introducir también la ruta y directorio final de destino del proyecto en local, por ejemplo en este caso en **C:/R/proyectos**.
 
 ![Copiar la ruta origen y poner ruta local de destino](imag/github_rstudio_04.png)
 
@@ -73,13 +76,24 @@ Si en local hacemos cambios y los queremos actualizar ficheros, hay que hacer el
 
 Primero guardar los cambios e ir a la ventana de Git en RSTUDIO (generalmente situada en la parte derecha arriba)
 
-![Trabajar con Git en RSTUDIO](imag/github_rstudio_03.png)
+![Trabajar con Git en RSTUDIO](imag/github_rstudio_05.png)
 
-Para subir un cambio al almacén web (GitHub) debemos hacer un **pull request** es decir proponer qué ficheros se van a actualizar, eso se hace pinchando directamente sobre el nombre del fichero en la ventana de Git.
+Para subir un cambio al almacén web (GitHub) debemos hacer un *Commit* es decir proponer qué ficheros se van a actualizar, eso se hace pinchando directamente sobre el nombre del fichero en la ventana de Git.
 
-![Subir o actualizar cambios](imag/github_rstudio_03.png)
+![Subir o actualizar cambios](imag/github_rstudio_06.png)
 
-Como vemos el estado del fichero cambia a **A**, (add) es decir se añaden a la lista de documentos propuestos para el cambio en la linea de tiempos.
+Como vemos el estado del fichero cambia a *A*, (add) es decir se añaden a la lista de documentos propuestos para el cambio en la linea de tiempos.
 Es decir que cuando subamos al almacén los ficheros pasarán a sustituir a los actuales y serán los de la ultima versión.
 
-Pasa subir definitvamente los fichero con los cambios debemos pinchar en la flecha hacia arriba de la ventana de Git (control de versiones) en RSTUDIO.
+Pinchamos en el botón *Commit* y se abrirá una nueva ventana para para confirmar los cambios e introducir una descripcion de los mismos:
+
+![Hacer un commit o propuesta de actualización](imag/github_rstudio_07.png)
+
+
+Para subir definitivamente los ficheros con los cambios debemos hacer un *pull request* pinchando en la flecha hacia arriba de la ventana de Git (control de versiones) en RSTUDIO.
+
+![Hacer un pull request para aceptar los cambios en el master](imag/github_rstudio_08.png)
+
+De esta forma los cambios propuestos con el *Commit, se convierten en definitivos y los ficheros se suben a GitHub y aparecen como la version de trabajo actual o master.
+
+![Ya podemos ver en la web los cambios actualizados](imag/github_rstudio_09.png)

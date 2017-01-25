@@ -1,5 +1,5 @@
 # Data_Science_Coursera
-Apuntes (*en Español*) del programa de especialización en Data Science de Coursera de la Universidad Johns Hopkins
+Apuntes (*en Espa�ol*) del programa de especialización en Data Science de Coursera de la Universidad Johns Hopkins
 
 En este proyecto vamos a realizar unos apuntes en español de los cursos de la especialidad en ciencia de datos (Data Science) impartido en la web de coursera por la Universidad Johns Hopkins.
 
@@ -9,15 +9,15 @@ Existen multitud de apuntes de los cursos en el idioma original, pero creo inter
 
 A medida que vaya realizando los cursos iré completando los apuntes de los mismos.
 
-**IMPORTANTE:** Este libro de apuntes, en cumplimiento del código de honor de Coursera, no contendrá soluciones directas a los examenes de los cursos, tan solo apuntes para facilitar su aprendizaje.
+**IMPORTANTE:** Este libro de apuntes, en cumplimiento del código de honor de Coursera, no contendr� soluciones directas a los examenes de los cursos, tan solo apuntes para facilitar su aprendizaje.
 
 ## APORTES COMPLEMENTARIOS A LOS CURSOS Y DE USO GENERAL EN TODOS
 
  * [Chuleta de código R, extendida](chuleta_R.Rmd)
  * Chuleta de código R. Gráficos
- * Cómo conectar GitHub - RSTUDIO
+ * [C�mo conectar GitHub y RSTUDIO](conectar_GitHub_RSTUDIO.Rmd)
  * Chuleta de markdown
- * Webs de interes.
+ * Webs de interes
  * Enlaces especificos por cursos de especialidad
  
 ## ÍNDICE DE CURSOS DE LA ESPECIALIZACIÓN
