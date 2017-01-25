@@ -11,6 +11,7 @@ A medida que vaya realizando los cursos ir√© completando los apuntes de los mism
 
 **IMPORTANTE:** Este libro de apuntes, en cumplimiento del c√≥digo de honor de Coursera, no contendr· soluciones directas a los examenes de los cursos, tan solo apuntes para facilitar su aprendizaje.
 
+
 ## APORTES COMPLEMENTARIOS A LOS CURSOS Y DE USO GENERAL EN TODOS
 
  * [Chuleta de cÛdigo R](chuleta_R.Rmd)
@@ -22,7 +23,7 @@ A medida que vaya realizando los cursos ir√© completando los apuntes de los mism
  
 ## √çNDICE DE CURSOS DE LA ESPECIALIZACI”N
 
- 1. [LA CAJA DEL CIENT√çFICO DE DATOS](01_DATA_SCIENCTIST_TOOLBOX/readme.Rmd)
+ 1. [LA CAJA DEL CIENTÕFICO DE DATOS](01_DATA_SCIENCTIST_TOOLBOX/readme.Rmd)
  2. CONCEPTOS B¡SICOS DE PROGRAMACI”N CON R
  3. OBTENER Y LIMPIAR DATOS
  4. [EXPLORAR Y ANALIZAR DATOS](04_EXPLORAR_Y_ANALIZAR_DATOS/01_GRAFICOS_EN_R.Rmd)
