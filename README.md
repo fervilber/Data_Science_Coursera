@@ -13,8 +13,8 @@ A medida que vaya realizando los cursos ir√© completando los apuntes de los mism
 
 ## APORTES COMPLEMENTARIOS A LOS CURSOS Y DE USO GENERAL EN TODOS
 
- * [Chuleta de c√≥digo R, extendida](chuleta_R.Rmd)
- * Chuleta de c√≥digo R. Gr√°ficos
+ * [Chuleta de cÛdigo R](chuleta_R.Rmd)
+ * Chuleta de cÛdigo R. Gr·ficos
  * [CÛmo conectar GitHub y RSTUDIO](conectar_GitHub_RSTUDIO.Rmd)
  * Chuleta de markdown
  * Webs de interes
