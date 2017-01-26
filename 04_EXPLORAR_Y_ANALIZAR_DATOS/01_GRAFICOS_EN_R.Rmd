@@ -18,13 +18,21 @@ knitr::opts_chunk$set(eval=FALSE)
 knitr::opts_chunk$set(echo=TRUE)
 
 ```
+## INDICE
+1. [Leccion 1](#l1)
+2. [Graficos 1D](#g1d)
+3. [Graficos 1D](#g2d)
+4. [Scatterplot](#st)
+5. [Leccion 2](#l2)
+6. [Plot](#BS)
 
-# 01 GRÁFICOS EN R
+
+# GRÁFICOS EN R 
 
 Esta es la primera lección del curso cuarto de la especialización en DATA SCIENCE.
 Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, donde se explica el uso de gráficos en R
 
-## Lección 1
+## Lección 1 <a name="l1"></a>
 
 ### Principios del análisis gráfico
 
@@ -40,10 +48,11 @@ Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, dond
 
 ¿Por qué pintamos los datos?
 Porque buscamos:
+
 1. comprenderlos
 2. Encontrar patrones
 3. Sugerir modelos de comprotamiento
-4. Depurar el analisis
+4. Depurar el análisis
 
 Qué caracteristicas tienen los gráficos exploratorios
 
@@ -59,9 +68,10 @@ head(pollution)
 
 ```
 
-###  GRÁFICOS 1D 
+###  GRÁFICOS 1D <a name="g1d"></a>
 
 Para explorar los datos de forma rápida podemos usar estas 5 características de R:
+
 1. *summary(data)* que devuelve el min, max, media, mediana y 2 cuantiles
 2. *boxplot(data, col="blue")* --> hace un gráfico simple con los datos de summary y una caja color azul en este caso que continene el 50% de los datos (entre el 25 y e 75%)
 3. *hist(data, col ="green", breaks=10 )*, hace la grafica del histograma de frecuencias en 10 partes. Se puede omitir breaks. Puedes añadir una marca de los datos con rug(pollution$pm25)
@@ -76,7 +86,7 @@ abline(h=12)
 
 hist(pollution$pm25, col="green")
  #podemos añadir una regla abajo del hist con todos los puntos
- #añadiendo rug SOLO VALE PARA 1D
+ # añadiendo rug SOLO VALE PARA 1D
 rug(pollution$pm25)
  # añadimos cortes.
 hist(pollution$pm25, col="green", breaks=100)
@@ -90,7 +100,7 @@ abline(v= median(pollution$pm25), col= "magenta", lwd=4)
 barplot(table(pollution$region), col="wheat", main="numero de condados por region")
 ```
 
-### GRAFICAS 2D
+### GRÁFICAS 2D <a name="g2d"></a>
 Complicamos la cosa con graficos de varias dimensiones.
 
 ```{r eval=FALSE}
@@ -105,7 +115,7 @@ hist(subset(pollution, region=="east")$pm25, col="green")
 hist(subset(pollution, region=="~west")$pm25, col="blue")
 ```
 
-### GRÁFICO DE DISPERSIÓN (SCATTERPLOT) 
+### GRÁFICO DE DISPERSIÓN (SCATTERPLOT)  <a name="sc"></a>
 Otra manera de representar datos de dos en dos es con graficas de dispersión o scatterplot en inglés.
 Para hacerlas en R usamos dos funciones principales plot y with
 
@@ -131,7 +141,7 @@ with(subset(pollution, region=="east"),plot(latitude,pm25, main="EAST"))
 
 ```
 
-Recursos
+### RECURSOS
 
 [R graph gallery](gallery.r-enthusiasts.com)
 
@@ -139,6 +149,7 @@ Recursos
 
 ## Lección 2. Trazado de gráficos en R
 
+### INTRODUCCIÓN <a name="l2"></a>
 Existen muchas formas de generar gráficas con R, tenemos que pensar qué salida queremos para los gráficos:
 
 1. ¿Será en papel? o en una pantalla?
@@ -150,21 +161,22 @@ Existen muchas formas de generar gráficas con R, tenemos que pensar qué salida q
 
 ...vamos a inciarnos en el tazado con las 3 técnicas más habituales:
 
-1. base plot system o sistema base 
+1. **base plot system** o sistema base 
     La idea es la misma que la de un artista ante un lienzo BLANCO.
     Se van añadiendo cosas una a una al lienzo con funciones diferenciadas: lineas, etiquetas, puntos, gráficas...
     Es una manera muy completa de crear, pero tiene el inconveniente de que si no quieres los valores por defecto tendrás que saber como hacer todo, y especificar cada una de las caracteristicas de trazado por cuenta de uno mismo.
-2. Lattice plot system
+2. **Lattice plot system**
     Los gráficos se crean de una.
     Bueno para muchas gráficas juntas en una página o pantalla
     
-3. ggplot system
+3. **ggplot system**
     Es una mezcla de los anteriores con unas opciones por defecto interesantes y capacidad para personalizar todo
 
 
-### Base Plotting system (sistema base)
+### Base Plotting system (sistema base) <a name="BS"></a>
 
-Podemos pintar o anotar, es decir pintar o pintar encima de lo ya representado
+Podemos pintar o anotar, es decir pintar o pintar encima de lo ya representado.
+
 Los comandos básicos son: `plot, hist, boxplot`.
 
 *plot* y *hist* lanzarán un objeto gráfico, si no hay ya uno abierto.
