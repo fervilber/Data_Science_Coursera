@@ -4,11 +4,13 @@ author: "Fernando Villalba"
 date: "25 de enero de 2017"
 output:
   pdf_document:
+    fig_caption: yes
+    fig_width: 3
+    highlight: pygments
     toc: yes
-    toc_depth: '3'
+    toc_depth: 3
   html_document:
     fig_caption: yes
-    number_sections: yes
     toc: yes
     toc_depth: 2
 ---
@@ -16,7 +18,6 @@ output:
 ```{r setup}
 knitr::opts_chunk$set(eval=FALSE)
 knitr::opts_chunk$set(echo=TRUE)
-
 ```
 ## INDICE
 1. [Leccion 1](#l1)
@@ -30,11 +31,11 @@ knitr::opts_chunk$set(echo=TRUE)
 # GRÁFICOS EN R 
 
 Esta es la primera lección del curso cuarto de la especialización en DATA SCIENCE.
-Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, donde se explica el uso de gráficos en R
+Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, donde se explica el uso de gráficos en R.
 
-## Lección 1 <a name="l1"></a>
 
-### Principios del análisis gráfico
+## INTRODUCCIÓN  <a name="l1"></a>
+Existen unos  **Principios del análisis gráfico** sobre los que conbiene reflexionar y recordar en todo el proceso de trazado. Recordemos que se trata de un curso de ciencia de datos, por lo que: 
 
 1. Siempre compara, busca una estado relativo sobre el que comparar los datos e hipótesis.
 2. Muestra la causalidad, el mecanismo, la explicación del sistema y su estructura.
@@ -43,85 +44,100 @@ Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, dond
 5. Documenta el proceso a analisis para que sea totalmente reproducible.
 6. Cuenta una historia, busca el contenido o fin de lo que presentas.
 
+Al representar los datos en gráficas buscamos muchas cosas: comprenderlos, encontrar patrones, sugerir modelos de comprotamiento. Entonces ¿Por qué pintamos los datos en gráficas?, muy sencillo, hay un refrán español que dice: *más vale una imagen que 1000 palabras*.
 
-### Explorar datos con gráficos
+Aunque existen muchas maneras de pintar datos con R, en estas lecciones vamos a centrarnos en 3 funciones, las caracteristicas del sistema base de R, la librería lattice y la librería ggplot.
 
-¿Por qué pintamos los datos?
-Porque buscamos:
+Cuando vamos a representar datos, tenemos tambien que pensar qué salida queremos para los gráficos:
 
-1. comprenderlos
-2. Encontrar patrones
-3. Sugerir modelos de comprotamiento
-4. Depurar el análisis
+1. ¿Será en papel? o en una pantalla?
+2. ¿Se usará en una web?, para una presentación?
+3. ¿es muy grandeel número de datos a pintar?
+4. ¿Necesitaremos que cambie de tamaño de forma dinámica? o interactuar con él?
+5. ¿qué sistema usaremos para pintar?.... oleo, pastel, digital?
 
-Qué caracteristicas tienen los gráficos exploratorios
+El tipo de salida lo veremos en el apartado de dispositivos gráficos y puede ser importante si piensas usar los graficos no solo en la pantalla, sino para presentaciones o libros.
 
-1. Se hacen rápido
-2. manejan grandes conjuntos de datos
-3. facilitan la comprensión de los mismos
-
-Vamos a trabajar con los datos ejemplo de calidad del aire que salen de la [EPA Air Quality System](https://www.epa.gov/aqs), de su web descargamos el fichero de datos de los condados de EEUU y medidas de la calidad del aire:
+En las lecciones del curso web se usa una tabla de datos extraida de la web de la agencia EPA de EEUU. Desde su web [EPA Air Quality System](https://www.epa.gov/aqs) podemos descargar los datos de ejemplo, que se corresponden con datos de calidad del aire en cada condado de  EEUU.
 
 ```{r eval=FALSE}
+# Lectura del fichero con los datos para los ejemplos
 pollution <- read.csv("data/avgpm25.csv", colClasses=c("numeric", "character","factor","numeric","numeric"))
 head(pollution)
 
 ```
+Para estos apuntes, hemos usado los datos de ejemplo incluidos en la librería `datasets`, en concreto la tabla 'cars`.
 
-###  GRÁFICOS 1D <a name="g1d"></a>
 
-Para explorar los datos de forma rápida podemos usar estas 5 características de R:
+### Gráficos simples de 1 variable <a name="g1d"></a>
 
-1. *summary(data)* que devuelve el min, max, media, mediana y 2 cuantiles
+Para explorar datos simples de una variable de forma rápida y dibujarlos, podemos usar estas características o funciones de R:
+
+1. *summary(data)* que devuelve el min, max, media, mediana y 2 cuantiles, no pinta pero siempre es bueno resumir.
 2. *boxplot(data, col="blue")* --> hace un gráfico simple con los datos de summary y una caja color azul en este caso que continene el 50% de los datos (entre el 25 y e 75%)
 3. *hist(data, col ="green", breaks=10 )*, hace la grafica del histograma de frecuencias en 10 partes. Se puede omitir breaks. Puedes añadir una marca de los datos con rug(pollution$pm25)
 4. *barplot(data, col=wheat)* hace gráfico de barras color trigo
 
-```{r eval=FALSE}
-summary(pollution$pm25)
+Veamos unos ejemplos de código:
 
-boxplot(pollution$pm25, col="blue")
-#si queremos añadir una linea al boxplot, por ejemplo ara marcar el limite de 12
+```{r eval=TRUE}
+#Si no queremos o tenemos el fichero de EPA podemos usar datos de muestra del paquete datasets 
+library(datasets) # cargamos el paquete de datos de muestra
+head(cars)
+summary(cars$speed)
+
+boxplot(cars$speed, col="blue")
+#si queremos añadir una linea al boxplot, por ejemplo para marcar el limite de 12
 abline(h=12)
 
-hist(pollution$pm25, col="green")
+hist(cars$speed, col="green")
  #podemos añadir una regla abajo del hist con todos los puntos
- # añadiendo rug SOLO VALE PARA 1D
-rug(pollution$pm25)
+ # añadiendo rug SOLO VALE PARA 1D. nos pone una marca en cada punto de dato
+rug(cars$speed)
+
+#Generamos datos aleatorios
+x<-rnorm(100)
  # añadimos cortes.
-hist(pollution$pm25, col="green", breaks=100)
+hist(x, col="green", breaks=5)
+rug(x)
+
  #añadimos linea vertical
-abline(v= 12, lwd=2) # grosor 2)
+abline(v= 1, lwd=2) # grosor 2)
  #añadimos linea vertical en la media
-abline(v= median(pollution$pm25), col= "magenta", lwd=4) 
+abline(v= median(x), col= "magenta", lwd=4) 
  # lwd=line_width=grosor 2)
  # lty=tipo linea
 
-barplot(table(pollution$region), col="wheat", main="numero de condados por region")
+#barplot(table(pollution$region), col="wheat", main="numero de condados por region")
 ```
 
-### GRÁFICAS 2D <a name="g2d"></a>
-Complicamos la cosa con graficos de varias dimensiones.
+### Gráficos 2D <a name="g2d"></a>
+Si añadimos más variables a la gráfica usaremos funciones como `boxplot` o `with`.
 
 ```{r eval=FALSE}
 # grafico por region de los datos (tecla 4 altgr ~)
-boxplot(pm25 ~ regon , data= pollution, col="red")
+boxplot(pm25 ~ region , data= pollution, col="red")
+# boxplot(speed ~ dist, cars)
+```
 
+Existe la obcion de dividir el lienzo en varios graficos con las opciones de `par()`.
 
+```{r eval=FALSE}
 # dos histogramas
 # dividimos la ventana grafica en 2 filas 1 col
 par(mfrow=c(2,1), mar=c(4,4,2,1)) 
 hist(subset(pollution, region=="east")$pm25, col="green")
-hist(subset(pollution, region=="~west")$pm25, col="blue")
+hist(subset(pollution, region=="west")$pm25, col="blue")
 ```
 
-### GRÁFICO DE DISPERSIÓN (SCATTERPLOT)  <a name="sc"></a>
+#### Gráficos de dispersión (SCATTERPLOT)  <a name="sc"></a>
 Otra manera de representar datos de dos en dos es con graficas de dispersión o scatterplot en inglés.
-Para hacerlas en R usamos dos funciones principales plot y with
 
-1. plot(y ~ x, data = pollution)
+Para hacerlas en R usamos dos funciones principales `plot` y `with`
+
+1. `plot(y ~ x, data = unatabla)`
     el símbolo ~ se hace con la tecla AltGr + 4.
-2. with(pollution, plot(y, x))
+2. `with(unatabla, plot(y, x))`
 
 ```{r eval=FALSE}
 with(pollution,plot(latitude,pm25))
@@ -131,51 +147,108 @@ abline(h=12,lwd=2,lty=2)
 with(pollution,plot(latitude,pm25, col=region ))
 abline(h=12,lwd=2,lty=2)
 
-
-
 ## multiples scatterplots
 par(mfrow=c(2,1), mar=c(5,4,2,1)) 
 with(subset(pollution, region=="west"),plot(latitude,pm25, main="WEST"))
 with(subset(pollution, region=="east"),plot(latitude,pm25, main="EAST"))
-
-
 ```
 
-### RECURSOS
+## DISPOSITIVOS GRÁFICOS
 
-[R graph gallery](gallery.r-enthusiasts.com)
+### ¿Qué es un dispositivo gráfico?
 
-[R Bloggers](http://www.r-bloggers.com/)
+* Un dispositivo gráfico es el objeto en el que pintamos, el lienzo sobre el que trazamos las gráficas, por ejemplo:
+    * una ventana en el PC, es un dispositivo gráfico de pantalla (screen device)
+    * un fichero PDF 
+    * un fichero PNG, JPEG 
+    * un fichero SVG (scalable vector graphic)
+* Cuando generamos un gráfico, tiene que ser enviado a un dispositivo que haga de lienzo.
+* Para abrir un dispositivo usamos los comandos:
+    * `quatz()` en Mac, `X11()` en Linux, `windows()` en Windows
+    * `?Device` par encontrar todos los dispositivos
+* `plot`, `xyplot`, `qplot` son funciones que envían el grafico al dispositivo "pantalla"
+* los ficheros son tambien muy usados si queremos imprimir o hacer una presentación o guardar nuestro gráfico de forma independiente.
 
-## Lección 2. Trazado de gráficos en R
+### Cómo se crea un gráfico
 
-### INTRODUCCIÓN <a name="l2"></a>
-Existen muchas formas de generar gráficas con R, tenemos que pensar qué salida queremos para los gráficos:
+* llamando explicitamente al dispositivo
 
-1. ¿Será en papel? o en una pantalla?
-2. ¿Se usará en una web?, para una presentación?
-3. ¿es muy grandeel número de datos a pintar?
-4. ¿Necesitaremos que cambie de tamaño de forma dinámica? o interactuar con él?
-5. ¿qué sistema usaremos para pintar?.... oleo, pastel, digital?
+```{r eval=FALSE}
+# pdf
+pdf(file = "myplot.pdf")
+```
 
+* llamando a una funcion de dibujo
+* sobreescribiendo en un gráfico existente
+* **_para cerrar especificamente un dispositivo llamamos_** `dev.off()`
 
-...vamos a inciarnos en el tazado con las 3 técnicas más habituales:
+### Pintar en ficheros
+
+#### Vectoriales
+
+* Pros: bueno para graficos lineales, cambiar tamaño sin perder calidad sin distorsión.
+* Contras: no son buenos cuando hay gran cantidad de puntos/datos que pintar.
+
+Los dispositivos usuales de este tipo son: pdf, svg, windows metafile o 
+postscript.
+
+#### Raster
+
+* Pros: good for plot with lots of points
+* Contras: doesn't resize well
+
+Formatos de este tipo habituales son: png, jpeg, tiff o bmp.
+
+### Múltiples dispositivos graficos
+
+Podemos abrir muchos dispositivos, pero solo podemos pintar desde R en uno cada vez. Cada dispositivo tiene un número entero como identificativo.
+
+* `dev.cur()` --> nos da el numero del dispositivo actual
+* `dev.set(integer)`--> establece el dispositivo indicado en integer como actual.
+
+### Copiar gráficas
+Lo usamos cuando nos gusta por ejemplo la que hemos hecho en pantalla y la queremos guardar en fichero:
+
+```{r eval=FALSE}
+library(datasets)
+with(faithful,plot(eruptions,waiting)) # Crea un dibujo
+title(main="Datos de daños Geyser") # sobreescribimos el título
+dev.copy(png, file = "myfile.png") # copia el dibujo a un fichero png
+dev.off() # cierra el dispositivo png.
+```
+Para copiar en pdf existe una funcion especifica `dev.copy2pdf`
+
+**Advertencia: los gráficos no tienen por qué mostrarse igual que en pantalla.**
+
+### Ejemplos
+
+```{r eval=FALSE}
+# pdf
+pdf(file = "myplot.pdf") # abrimos el dispositivo gráfico
+#creamos un grafico y lo mandamos al dispositivo pdf
+with(faithful,plot(eruptions,waiting))
+title(main="Datos de daños Geyser") # sobreescribimos el título
+dev.off()# cerramos el dispositivo
+```
+
+## SISTEMAS DE TRAZADO DE GRÁFICOS EN R
+
+En estas lecciones vamos a usar los 3 sistemas principales de generar gráficos en R, a los que dedicaremos un apartado de desarrollo específico. No son los únicos, hay cientos de librerías para generar gráficas, pero estas son las más usadas:
 
 1. **base plot system** o sistema base 
-    La idea es la misma que la de un artista ante un lienzo BLANCO.
+    Es el sistema de pintado por defecto incluido en el nucleo de R. La idea es la misma que la de un artista ante un lienzo blanco.
     Se van añadiendo cosas una a una al lienzo con funciones diferenciadas: lineas, etiquetas, puntos, gráficas...
-    Es una manera muy completa de crear, pero tiene el inconveniente de que si no quieres los valores por defecto tendrás que saber como hacer todo, y especificar cada una de las caracteristicas de trazado por cuenta de uno mismo.
+    Es una manera muy completa de crear, pero tiene el inconveniente de que si no quieres los valores por defecto tendrás que saber como hacer cada cosa específica.
 2. **Lattice plot system**
-    Los gráficos se crean de una.
+    Los gráficos se crean de una vez llaman.
     Bueno para muchas gráficas juntas en una página o pantalla
-    
 3. **ggplot system**
     Es una mezcla de los anteriores con unas opciones por defecto interesantes y capacidad para personalizar todo
 
 
 ### Base Plotting system (sistema base) <a name="BS"></a>
 
-Podemos pintar o anotar, es decir pintar o pintar encima de lo ya representado.
+Es el SISTEMA ELEMENTAL PARA PINTAR GRÁFICOS CON R
 
 Los comandos básicos son: `plot, hist, boxplot`.
 
@@ -184,7 +257,7 @@ plot tienen muchas opciones de personalización, titulos ejes..gran parte de esta
 
 El sistema base está incluido en las librerías del núcleo de R graphics y grDevices. La primera contiene los comandos plot, hist etc.. y la segunda todos los comandos relacionados con los dispositivos gráficos de impresión, ya sea la pantalla, un fichero, un pdf etc...
 
-### Parámetros globales de 'plot' (par):
+#### Parámetros globales de 'plot' (par):
 Usa `par()` para especificar estos parametros, tambien para ver el valor de estos parámetros actualmente `par("col")`.
 
 * `pch`: simbolo del dato (circulos por defecto. ver `points` para más detalles)
@@ -205,7 +278,7 @@ text.
 
 ![tipos de linea \label{lineas}](imag/lines.png)
 
-### Funciones de Base plotting
+#### Funciones de Base plotting
 
 * `plot`: crea un gráfico dependiendo de los datos hace uno u otro tipo.
 * `lines`: añade una linea a una gráfica.
@@ -218,7 +291,7 @@ text.
 * `legend`: add legend. If they are the line, specify `lty`. If they are
 character, specify `pch`.
 
-### Ejemplos Base Plotting Demonstration
+#### Ejemplos Base Plotting Demonstration
 
 Podemos usar la función `examples` para ver muchos ejemplos gráficos:
 `examples(points)`
@@ -255,78 +328,9 @@ with(airquality, {
 ```
 
 
-## Lección 3. Dispositivos gráficos
+### Lattice plotting system
 
-### What is a graphic device
-
-* A graphic device is something we can make plot apprear
-    * a window, it's a screen device
-    * A PDF file
-    * A PNG, JPEG file
-    * A SVG file (scalable vector graphic)
-* When making a plot, it has to be sent to a graphic device
-* To open screen device
-    * `quatz()` on Mac, `X11()` on Linux, `windows()` on Windows
-    * `?Device` to find all devices
-* `plot`, `xyplot`, `qplot` will send plot to screen device. And there is only
-one screen device for all the 3 platforms
-* file devices are appropriate for paper/slide/presentation
-
-### How does a plot get created?
-
-* Explicitly launch a graphic device
-
-```{r eval=FALSE}
-pdf(file = "myplot.pdf")
-```
-
-* Call a plot function to make a plot
-* Annotate the plot
-* **_Explicitly close the graphic device by calling_** `dev.off()`
-
-### Graphic file devices
-
-Vector formats:
-
-* Pros: useful for line graphics, resize well, won't distort.
-* Cons: not good for plot with lots of points/objects
-* pdf
-* svg, useful for animation and web-based plot
-* windows metafile: windows only
-* postscript: not use very often
-
-Bitmap formats:
-
-* Pros: good for plot with lots of points
-* Cons: doesn't resize well
-* png
-* jpeg: good for natural scenes, very small, not good for line drawing
-* tiff
-* bmp
-
-### Multiple open graphic devices
-
-* can launch multiple devices
-* only one is active at a time
-* each one gets a integer nubmer >= 2
-* find the current device by `dev.cur()`
-* set active device by `dev.set(integer)`
-
-### Copy plots
-
-```{r eval=FALSE}
-dev.copy(png, file = "myfile.png")
-dev.off()
-# if want PDF
-dev.copy2pdf
-```
-
-**Warning: the plot may not be exactly the same as seen in screen**
-
-
-## Lattice plotting system
-
-### Introduction
+#### Introduction
 
 * Lattice contains function to produce trellis graphics, including:
     * `xyplot`
@@ -336,7 +340,7 @@ dev.copy2pdf
 * Doesn't have two phases: plotting and annotation
 * All plotting/annotation is done at once with a single function call
 
-### Important functions
+#### Important functions
 
 * `xyplot`: scatterplot
 * `bwplot`: boxplot
@@ -346,7 +350,7 @@ dev.copy2pdf
 * `splom`:scatterplot matrix; like the `paris` in base system
 * `levelplot`, `contourplot`: for plotting image data
 
-### `xyplot` function
+#### xyplot` function
 
 ```python
 xyplot(y ~ x | f * g, data)
@@ -361,7 +365,7 @@ xyplot(y ~ x | f * g, data)
 * data is the dataframe
     * if no dataframe passed, it will look into parent frame.
 
-### Simple lattice plot
+#### Simple lattice plot
 
 * Basic one
 
@@ -382,7 +386,7 @@ airquality <- transform(airquality, Month = factor(Month))
 xyplot(Ozone ~ Wind | Month, data = airquality, layout = c(5, 1))
 ```
 
-### Lattice behaviour
+#### Lattice behaviour
 
 Fundamental difference between base plot system
 
@@ -392,7 +396,7 @@ Fundamental difference between base plot system
 * It's better to keep the data and code
 * On the command line, trellis objects are auto-printed.
 
-### Lattice panel functions
+#### Lattice panel functions
 
 * Lattice functions have **_panel functions_** which controls what happens inside each panel
 * Can supply our own to customize the panel
@@ -413,7 +417,7 @@ xyplot(y ~ x | f, panel = function(x, y, ...) {
 })
 ```
 
-### Summary
+#### Summary
 
 * Lattice functions are constructed with one single function call
 * margins and spacing are handled automatically
@@ -422,9 +426,9 @@ under many different conditions
 * panel functions can be specified and customized to modify what is plotted in
 each of the plot panels
 
-## ggplot2
+### ggplot2
 
-### What is ggplot2?
+#### What is ggplot2?
 
 * An implementation of grammar of graphics.
 * Written by Hadley Wickham
@@ -434,13 +438,13 @@ each of the plot panels
 * Allow theory of graphics to build new graph and graphic objects
 * Shorten the distance from mind to page
 
-### Grammar of Graphics
+#### Grammar of Graphics
 
 * Statistic graph is a mapping from data to aesthetic attributes (color, shape,
 size) and geometric objects (points, lines, bars). The plot may contain statistic
 transformation of data and is drawn on a specific coordinate system
 
-### The basics `qplot`
+#### The basics `qplot`
 
 * much like the plot in base system
 * must look for a dataframe, if cannot find, look in parent environment.
@@ -449,14 +453,14 @@ transformation of data and is drawn on a specific coordinate system
 * `qplot` hides underneath
 * `ggplot` is core function and very flexible
 
-## ggplot2 part2
+### ggplot2 part2
 
 ```{r eval=FALSE}
 # installation
 install.packages("ggplot2")
 ```
 
-### Hello word for ggplot2
+#### Hello word for ggplot2
 
 ```{r eval=FALSE}
 library(ggplot2)
@@ -464,7 +468,7 @@ str(mpg)
 qplot(displ, hwy, data = mpg)
 ```
 
-### Aesthetic
+#### Aesthetic
 
 We map the drv variable to different colors, and the plot is automatically labeled.
 
@@ -472,7 +476,7 @@ We map the drv variable to different colors, and the plot is automatically label
 qplot(displ, hwy, data = mpg, color = drv)
 ```
 
-### Adding geoms
+#### Adding geoms
 
 We can add a smooth line here, note that we want 2 geometric objects here, the
 data points themselves and the a smooth line.
@@ -481,7 +485,7 @@ data points themselves and the a smooth line.
 qplot(displ, hwy, data = mpg, geom = c("point", "smooth"))
 ```
 
-### Histogram
+#### Histogram
 
 Make histogram by just specify single variable. Note that here, we need to use
 `fill` argument to specify colors.
@@ -490,7 +494,7 @@ Make histogram by just specify single variable. Note that here, we need to use
 qplot(hwy, data = mpg, fill = drv)
 ```
 
-### Facets
+#### Facets
 
 * Like panels in lattice. We want distinguish different subsets of a dataframe. One
 option is use different color code, another is to use different panels.
@@ -504,13 +508,13 @@ qplot(displ, hwy, data = mpg, facets = . ~ drv)
 qplot(hwy, data = mpg, facets = drv ~ ., binwidth = 2)
 ```
 
-### Density smooth
+#### Density smooth
 
 ```{r eval=FALSE}
 qplot(log(eno), data = maacs, geom = "density", color = mopos)
 ```
 
-### Scatterplot
+#### Scatterplot
 
 * In addition to separate subset by color code, we can also use `shape` argument
 * We can also add smooth line, the default smooth fitting method is "loose", we
@@ -527,16 +531,16 @@ qplot(log(eno), log(pm25), data = maacs, color = mopos, geom = c("point", "smoot
 qplot(log(eno), log(pm25), data = maacs, facets = . ~ mopos, geom = c("point", "smooth"), method = "lm")
 ```
 
-### Summary of qplot
+#### Summary of qplot
 
 * Anolog to plot but with many built-in features
 * Syntax between base and lattice system
 * Nice graphics
 * Don't bother to customize it, use `ggplot2` full power
 
-## `ggplot` part3
+### `ggplot` part3
 
-### Basic components
+#### Basic components
 
 * dataframe: the data source
 * aesthetic mappings: color, size
@@ -546,7 +550,7 @@ qplot(log(eno), log(pm25), data = maacs, facets = . ~ mopos, geom = c("point", "
 * scales: scale aesthetic mapping uses, e.g. male = red, female = blue
 * coordinate system
 
-### Building Plots with ggplot2
+#### Building Plots with ggplot2
 
 * Artist's palette model
 * Plots are built in layers
@@ -571,7 +575,7 @@ p <- g + geom_point() + geom_smooth(method = "lm")
 # It's better to make sure to label data properly
 p <- p + facet_grid(. ~ bmicat)
 ```
-### Annotation
+#### Annotation
 * Labels: `xlab`, `ylab`, `lab`, `ggtitle`
 * Each geom function has options to modify
 * For things that make sense globally, use theme()
@@ -592,9 +596,9 @@ geom_point(aes(color = bmicat), alpha = 1/2, size = 4)
 + theme_bw(base_family = "Times")
 ```
 
-## `ggplot2` part 5
+### `ggplot2` part 5
 
-### A note about axis limit
+#### A note about axis limit
 
 Sometimes we may not want to look at the outlier and only focus the typical data
 
@@ -606,12 +610,12 @@ g + geom_line() + ylim(-3, 3)
 g + geom_line() + coord_cartesian(ylim(-3, 3))
 ```
 
-### More complex example
+#### More complex example
 
 We want to see the NO2 and BMI, but NO2 is continous variables. We could use `cut()`
 function to make it categorical variable.
 
-### Making NO2 Tertile
+#### Making NO2 Tertile
 
 ```{r eval=FALSE}
 # Calculate the deciles of the data
@@ -631,6 +635,30 @@ g + geom_point(alpha = 1/3)
   + labs(y = "Nocturnal Symptoms")
   + lebs(title = "MAACS Cohort")
 ```
-### Summary of `ggplot`
+#### Summary of `ggplot`
 
 * Very powerful and flexible
+
+##??? PRACTICAS CON SWIRL
+Para realizar las prácticas con swirl, hacemos lo siguiente:
+
+```{r}
+install.packages("swirl")
+library(swirl)
+
+install_from_swirl("Exploratory Data Analysis")
+swirl()
+```
+Hay 5 lecciones para el curso 4.
+
+1.    Principles of Analytic Graphs
+2.    Exploratory Graphs
+3.    Graphics Devices in R
+4.    Plotting Systems
+    Base Plotting System
+    
+## RECURSOS EXTERNOS
+
+[R graph gallery](gallery.r-enthusiasts.com)
+
+[R Bloggers](http://www.r-bloggers.com/)
