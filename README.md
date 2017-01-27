@@ -9,7 +9,7 @@ Existen multitud de apuntes de los cursos en el idioma original, pero creo inter
 
 A medida que vaya realizando los cursos ir√© completando los apuntes de los mismos.
 
-**IMPORTANTE:** Este libro de apuntes, en cumplimiento del c√≥digo de honor de Coursera, no contendr· soluciones directas a los examenes de los cursos, tan solo apuntes para facilitar su aprendizaje.
+**IMPORTANTE:** Este libro de apuntes, en cumplimiento del cÛdigo de honor de Coursera, no contendr· soluciones directas a los examenes de los cursos, tan solo apuntes para facilitar su aprendizaje.
 
 
 ## APORTES COMPLEMENTARIOS A LOS CURSOS Y DE USO GENERAL EN TODOS
