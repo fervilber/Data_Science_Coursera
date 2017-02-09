@@ -1,0 +1,257 @@
+---
+title: "chuleta_Graficos_R"
+author: "Fernando Villalba"
+date: "8 de febrero de 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# PRIMER VISTAZO A LOS DATOS
+Antes de hacer un gráfico vemos las dimensiones contenido etc. de forma rápida.
+
+Para los ejemplos usaremos alguna veces datos incluidos en R de la librería datasets y otras veces generaremos series aleatorias rápidas:
+
+```{r}
+library(datasets) # cargamos el paquete de datos de muestra
+head(cars)
+dim(cars) # dimension de la tabla
+names(cars)#para saber los nombres de las variables en la tabla cars
+
+summary(cars$speed) # da el min, 25%,mediana=50%, media, 75% y max
+quantile(cars$speed)
+```
+
+Ahora lo mismo para una dataframe que generamos con variables aleatorias:
+```{r}
+#Generamos datos aleatorios
+x<-1:100
+y<-rnorm(100)
+df<-data.frame(x,y)
+```
+## SELECCIONAR SUBCONJUNTOS DE LOS DATOS
+
+Lo más sencillo es usar el comamdo subset de R base.
+subset(dataframe, condicion=="west")$pm25
+
+
+# HISTOGRAMAS
+
+Empezamos con los gráficos más simples de una variable, los que nos dan el histograma de frecuencia de los datos. 
+/ 
+```{r}
+hist(cars$speed, col="green")
+ # Podemos añadir una regla abajo del hist con todos los puntos
+ # añadiendo rug SOLO VALE PARA 1D. nos pone una marca en cada punto de dato
+rug(cars$speed)
+ 
+hist(x, col="green", breaks=5)
+rug(x)
+
+ #añadimos linea vertical
+abline(v= 1, lwd=2) # grosor 2)
+ #añadimos linea vertical en la media
+abline(v= median(x), col= "magenta", lwd=4) 
+ # lwd=line_width=grosor 2)
+ # lty=tipo linea
+
+barplot(table(pollution$region), col="wheat", main="numero de condados por region")
+```
+
+
+```{r histograma1}
+set.seed(42)
+par(mfrow=c(1,2))                            # una fila con dos col de graficos
+p1 <- hist(rnorm(500,4))                     # centrado en 4
+p2 <- hist(rnorm(500,6))                     # centrado en 6
+plot( p1, col=rgb(0,0,1,1/4), xlim=c(0,10))  # primer histograma
+
+plot( p1, col=rgb(0,0,1,1/4), xlim=c(0,10))  # repetimos para la segunda grafica
+plot( p2, col=rgb(1,0,0,1/4), xlim=c(0,10), add=T) # ojo con add añadimos al mismo grafico
+dev.off()
+
+```
+
+
+## Histograma con ggplot2
+podemos hacr u histograma más completo que diferencia por color la frecuencia
+
+```{r}
+ggplot(df, aes(y)) +
+  geom_histogram(aes(fill=..count..)) +
+  scale_fill_gradient("Count", low = "green", high = "red")+
+  geom_density(position = "stack") 
+
+
+ggplot(df, aes(x=y)) +
+  geom_histogram(aes(y =..density.., fill=..count..)) +
+  geom_density(lwd=1,adjust = 1/2) 
+
+ff<-ggplot(df, aes(x=y)) +  geom_histogram(aes(y =..density.., fill=..count..)) +
+  geom_density(lwd=1,adjust = 1/2) 
+```
+
+
+# CAJA BOX WHISPER
+Para los graficos de cajas es necesario si queremos hacr categorías convertir la variable de categoría a factor.
+
+```{r}
+boxplot(cars$speed, col="blue")
+#si queremos añadir una linea al boxplot, por ejemplo para marcar el limite de 12
+abline(h=12)
+
+# Grafica de cajas boxplot
+airquality<-transform(airquality,Month=factor(Month))
+boxplot(Ozone ~ Month, airquality, xlab="mes", ylab="ozono ppb")
+```
+
+
+# DISPERSIÓN x-y
+
+Graficos x-y s puende hacer de muchas formas:
+
+```{r pressure, echo=FALSE}
+library(datasets)
+head(cars)
+#pintamos de la datatable cars, dos variables
+with(cars, plot(speed,dist))
+# lo mismo con conlor transparente 0.3 : cex cambia las fuentes multiplica escala
+with(cars, plot(speed,dist,col=rgb(0,.5,.5,0.3),pch=19, cex=0.8))
+# Añadimos un texto al grafico
+# lo situamos en la mitad (media), parte alta 
+text(mean(cars$speed),max(cars$dist),"aquí va")
+# añado etiqueta a cada punto
+with(cars, text(speed,dist, labels = dist,pos=4))#row.names(cars), pos = 4))
+
+
+#--------otra -------
+with(pollution,plot(latitude,pm25, col=region ))
+abline(h=12,lwd=2,lty=2)
+
+
+may <- subset(airquality, Month==5)
+#pintamos ese conjunto
+points(may$Wind,may$Ozone,col="blue",pch=17)
+# ahora los meses que no son mayo
+notmay <- subset(airquality, Month!=5)
+points(notmay$Wind,notmay$Ozone,col="red",pch=8)
+#añadimos la legenda
+legend("topright",pch=c(17,8),col=c("blue","red"),legend=c("May","Other Months"))
+
+
+boxplot(y~x,data=df, xlab="eje x", ylab="eje y",col.axis="blue",col.lab="red")
+#añadimos un titulo:
+title(main="Ejemplo de grafico x-y")
+mtext("Ozone and Weather in New York City",outer=TRUE)
+```
+## VARIAS LINEAS
+```{r}
+# cumsum es suma acumulada de la serie
+plot(df$x, cumsum(df$y)+3, ylab="eje y", xlab=" Eje X", type="n") # type n es que no lo pinta
+lines(df$x, cumsum(df$y), type= "l", col="grey")
+lines(df$x, cumsum(df$y)+1, type= "l", col="red")
+lines(df$x, cumsum(df$y)+3, type= "l", col="blue")
+legend("topright", pch =20, col=c("grey", "red","blue"),legend=c("gris","rojo","azul"))
+```
+
+## CON LEYENDA
+```{r}
+with(airquality, plot(Wind,Ozone, main="Ozono y viento en NY",pch=1))
+# Añado que pinte los del mes de mayo en azul
+with(subset(airquality, Month==5), points(Wind,Ozone,col="blue",pch=3))
+# Añadimosuna leyenda
+legend("topright", pch =c(1,3), col=c("blue","black"),legend=c("Mayo","otros"))
+#añadimos linea de regresion
+model<-lm(Ozone ~ Wind,airquality)
+abline(model,lwd=2)
+```
+
+
+
+# VARIAS GRAFICAS JUNTAS
+```{r}
+library(datasets) 
+
+#ahora un grafico de 3 graficas
+par(mfrow = c(1, 3),mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
+plot(airquality$Wind,airquality$Ozone,main="Ozone and Wind")
+plot(airquality$Solar.R,airquality$Ozone,main="Ozone and Solar Radiation")
+plot(airquality$Temp,airquality$Ozone,main="Ozone and Temperature")
+mtext("Ozone and Weather in New York City",outer=TRUE)
+dev.off()
+```
+# PALETA DE COLOR PERSONALIZADO
+podemos usar una de las 627 predefinidas en la variable `colors()` del siguiente modo:
+
+```{r}
+
+# para ver las escalas usaremos esta funcion:
+verEscalas<-function(cv){
+  myarg <- deparse(substitute(cv))
+  z<- outer( 1:20,1:20, "+")
+  obj<- list( x=1:20,y=1:20,z=z )
+  image(obj, col=cv, main=myarg  )
+}
+
+#generamos una paleta personalizada
+paletaFer<-colorRampPalette(c("red","blue"))
+verEscalas(paletaFer(10))
+ # paletaFer(10) = genera 10 colores de la paleta personlizada
+
+# otro ejemplo
+paletaFer<-colorRampPalette(colors(86),alpha=0.3) # 86="gray38"
+verEscalas(paletaFer(20))
+
+# Ejemplo de uso de la paleta
+plot(x,y,col=paletaFer(20),pch=20,lwd=10)
+
+#cambiando tamaño con datos:
+colorfondo<-paletaFer(20)#[3]
+with(df, symbols(x=x, y=y, circles=x/10, inches=1/3,ann=F, bg=colorfondo, fg=NULL))
+
+```
+Algo similar pero usando ggplot2:
+
+```{r}
+
+qplot(x, y, data = df, colour=y) + 
+    scale_colour_gradientn(colours=colorfondo)# cambia el color de gradiente
+
+ggplot(df, aes(y)) +
+    geom_histogram()
+     
+
+ggplot(df, aes(y)) +
+    geom_histogram(aes(fill=..count..)) +
+    scale_colour_gradientn(colours = terrain.colors(5))
+
+
+paletaFer<-colorRampPalette(colors(6),alpha=0.3) # 86="gray38"
+ggplot(df, aes(y)) +
+    geom_histogram(aes(fill=..count..)) +
+    scale_fill_gradient(colours = rainbow(7))
+```
+
+
+
+# PINTAR EN UN PDF
+
+```{r eval=FALSE}
+# pdf
+pdf(file = "myplot.pdf") # abrimos el dispositivo gráfico
+#creamos un grafico y lo mandamos al dispositivo pdf
+with(faithful,plot(eruptions,waiting))
+title(main="Datos de daños Geyser") # sobreescribimos el título
+dev.off()# cerramos el dispositivo, para volver a dejar la pantalla por defecto
+```
+
+# PINTAR UN PNG
+
+```{r}
+png('plot1.png',width = 480, height = 480, units = "px")
+hist(df$y, xlab="eje X", main="titulo del grafico", col="red")
+dev.off()
+```
+
