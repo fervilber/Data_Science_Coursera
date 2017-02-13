@@ -36,6 +36,18 @@ df<-data.frame(x,y)
 Lo más sencillo es usar el comamdo subset de R base.
 subset(dataframe, condicion=="west")$pm25
 
+## Generar series aleatorias
+
+Para muestray ejemplos muchas veces necesitamos generar una serie de datos aleatoria:
+
+```{r}
+sample(1:12) # genera una serie de nuemeros del 1 al 12 en orden aleatoro y sin repetir
+rep(c(1:5),3)# repite 1,2,3,4,5 ---- 3 veces
+
+rep(c(0,3),each=5) # repite c 5 veces y 3 5 veces --> 0 0 0 0 0 3 3 3 3 3
+
+```
+
 
 # HISTOGRAMAS
 
@@ -124,8 +136,8 @@ with(cars, plot(speed,dist,col=rgb(0,.5,.5,0.3),pch=19, cex=0.8))
 text(mean(cars$speed),max(cars$dist),"aquí va")
 # añado etiqueta a cada punto
 with(cars, text(speed,dist, labels = dist,pos=4))#row.names(cars), pos = 4))
-
-
+# Añadir label de datos
+#text(x = speed, y = dist, labels = rownames(dataFrame), pos=4, col="red")
 #--------otra -------
 with(pollution,plot(latitude,pm25, col=region ))
 abline(h=12,lwd=2,lty=2)

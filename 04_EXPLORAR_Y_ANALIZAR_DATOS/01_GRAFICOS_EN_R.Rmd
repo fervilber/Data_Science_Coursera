@@ -33,6 +33,9 @@ knitr::opts_chunk$set(echo=TRUE)
 Esta es la primera lección del curso cuarto de la especialización en DATA SCIENCE.
 Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, donde se explica el uso de gráficos en R.
 
+Este curso se centra en el [analisis exploratorio de datos](<https://es.wikipedia.org/wiki/An%C3%A1lisis_exploratorio_de_datos).
+
+El análisis exploratorio de datos definido por John W. Tukey (E.D.A.: Exploratory data analysis) es, básicamente, el tratamiento estadístico al que se someten las muestras recogidas durante un proceso de investigación en cualquier campo científico. Para mayor rapidez y precisión, todo el proceso suele realizarse por medios informáticos, con aplicaciones específicas para el tratamiento estadístico. Los E.D.A., no necesariamente, se llevan a cabo con una base de datos al uso, ni con una hoja de cálculo convencional; no obstante el programa SPSS y R (lenguaje de programación) son las aplicaciones más utilizadas, aunque no las únicas.
 
 # INTRODUCCIÓN A LOS GRÁFICOS DE EXPLORACION DE DATOS CON R <a name="l1"></a>
 
