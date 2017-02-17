@@ -102,7 +102,7 @@ El proceso es siempre el mismo:
 Veamos un ejemplo con datos generados aleatoriamente. Obtendremos como resultado el dendograma. 
 Para pintar solamente el dendrograma (sin adornos de titulos y labels) podemos usar la siguiente sentencia: `plot(as.dendrogram(hc))` tengamos en cuenta que la distancia por defecto que usa el dendrograma es la completa, es decir la distancia máxima entre los puntos de cada cluster, que es el valor que aparece como eje de ordenadas (y) del mismo. También pintaemos una linea de corte que nos divide el conjunto de datos en 3 clusters. 
 
-```{r fig.height = 3, fig.width = 4, fig.align='center'}
+```{r fig.height = 3, fig.width = 6, fig.align='center'}
 set.seed(1234)
 x <- rnorm(12,mean=rep(1:3,each=4),sd=0.2)
 y <- rnorm(12,mean=rep(c(1,2,1),each=4),sd=0.2)
@@ -398,18 +398,21 @@ Las columnas de U y las columnas de V son llamados vector singular izquierdo y v
 
 - ***Nota**: ortogonalidad implica que la matriz es siempre invertible [$A^{-1} = A^T$] y que la multiplicación de la matriz con su transpuesta es la matriz identidad (diagonal todo unos, resto ceros) [$AA^T = I$] *
 	- ***Nota**: diagonal implies that any value outside of the main diagonal ($\searrow$) = 0 *
-		+ example $$A = \begin{bmatrix}
+		+ Ejemplo $$A = \begin{bmatrix}
        1 & 0 & 0 \\
        0 & 2 & 0 \\
        0 & 0 & 3 \end{bmatrix}$$
-* ***Nota**: scale of data matters for SVD/PCA (scaling the data may help), patterns detected maybe mixed together, and computation is intensive for these operations *
 
-## Principal Components Analysis (PCA)
-* first scale the variables and run SVD on normalized matrix
-	* **scaling** = subtract each column by its mean and divide by its standard deviation
-* **principal components** = the right singular values or the $V$ matrix
+* ***Nota**: para realizar estos calculos es conveniente escalar la matriz de partida de forma que sean comparables las variables *
 
-### SVD y PCA Ejemplos
+### Principal Components Analysis (PCA)
+
+Los pasos para realizar un analisis PCA son:
+ 1. escalar las variables:
+	* **escalar** = restar la media de cada columna y dividir por la desviación estandar
+ 2. ejecutar un SVD sobre la matriz normalizada
+    * **componentes principales ** = son los valores singulares derechos de la matriz $V$
+
 * **$U$ y $V$ son matrices**
 	- `s <- svd(data)` = realiza un SVD en los datos ($n \times m$ matrix) y los separa en $u$, $v$, y $d$ matrices.
 		+ `s$u` = $n \times m$ matrix $\rightarrow$ variación horizontal
@@ -422,12 +425,13 @@ Las columnas de U y las columnas de V son llamados vector singular izquierdo y v
 El resultado es similar a las graficas que hemos visto antes:
 
 ```{r eval=FALSE}
-mat<-matrix(data=c(1,2,3,2,5,7),nrow = 2, ncol=3))
-svd(mat)
+mat<-matrix(data=c(1,2,3,2,5,7),nrow = 2, ncol=3)
+matSVD<-svd(mat)
 # como resultado nos da un vector y 2 matrices
-#multiplicar matrices se hace con %*%
+# multiplicar matrices se hace con %*%
 
-matu %*% diag %*% t(matv)
+matSVD$u %*% matSVD$d t(matSVD$v)
+
 ```
 
 
