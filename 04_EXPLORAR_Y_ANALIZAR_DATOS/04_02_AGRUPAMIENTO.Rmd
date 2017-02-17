@@ -583,7 +583,6 @@ plot(svd1$v[,1],pch=19, main="Original")
 plot(svd2$v[,1],pch=19, main="Imputed")
 ``` 
 
-
 ## Ejemplo de SVD con imagen
 en este ejemplo vremos como funciona la reduccion de dimensiones SVD para -por ejemplo -comprimir una imagen real:
 
