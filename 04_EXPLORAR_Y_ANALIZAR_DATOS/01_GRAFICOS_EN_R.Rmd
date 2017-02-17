@@ -15,9 +15,9 @@ output:
     toc_depth: 2
 ---
 
-```{r setup}
-knitr::opts_chunk$set(eval=FALSE)
-knitr::opts_chunk$set(echo=TRUE)
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(eval=FALSE,echo=TRUE,warning = FALSE,error = FALSE,message = FALSE)
+
 ```
 ## INDICE
 1. [Leccion 1](#l1)
@@ -90,7 +90,7 @@ Para explorar datos simples de una variable de forma rápida y dibujarlos, podemo
 
 Veamos unos ejemplos de código:
 
-```{r eval=TRUE}
+```{r eval=TRUE,fig.height = 3, fig.width = 5, fig.align='center'}
 #Si no queremos o tenemos el fichero de EPA podemos usar datos de muestra del paquete datasets 
 library(datasets) # cargamos el paquete de datos de muestra
 head(cars)
@@ -127,7 +127,7 @@ abline(v= median(x), col= "magenta", lwd=4)
 
 Para añadir un gráfico sobre el anterior, podemo usar el atributo add=TRUE
 Por ejemplo para crear varios histogramas uno encima del otro
-```{r}
+```{r eval=TRUE,fig.height = 3, fig.width = 5, fig.align='center'}
 set.seed(42)
 par(mfrow=c(1,2))
 p1 <- hist(rnorm(500,4))                     # centered at 4
@@ -1104,6 +1104,9 @@ swirl()
 
 ```
 
+points(cx,cy,col=c( "red", "orange","purple"), pch=3, cex=2,lwd=2)
+
+
 Hay 5 lecciones para el curso 4.
 
 1.    Principles of Analytic Graphs
@@ -1117,3 +1120,8 @@ Hay 5 lecciones para el curso 4.
 [www.edwardtufte.com](www.edwardtufte.com)
 [R graph gallery](gallery.r-enthusiasts.com)
 [R Bloggers](http://www.r-bloggers.com/)
+
+## REPASO DE APPLY
+2=COL 1=FILAS
+apply(matriz,2,funcion)
+tapply(x,newClust,mean)
