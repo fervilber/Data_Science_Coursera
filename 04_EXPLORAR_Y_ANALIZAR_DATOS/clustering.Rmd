@@ -1,0 +1,699 @@
+---
+title: "Clustering"
+author: "Fernando Villalba"
+date: "13 de febrero de 2017"
+output: 
+  pdf_document: 
+    fig_caption: yes
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+---
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(eval=TRUE,echo=TRUE,warning = FALSE,error = FALSE,message = FALSE)
+```
+# AGRUPAMIENTO DE DATOS
+
+Un [algoritmo de agrupamiento](http://en.wikipedia.org/wiki/Hierarchical_clustering) (en inglés, **clustering**) es un procedimiento de agrupación de una serie de vectores de acuerdo con un criterio. Esos criterios son por lo general distancia o similitud. 
+
+La cercanía se define en términos de una determinada función de distancia, como la euclídea, aunque existen otras más robustas o que permiten extenderla a variables discretas. La medida más utilizada para medir la similitud entre los casos es la matriz de correlación entre los n x n casos. Sin embargo, también existen muchos algoritmos que se basan en la máximización de una propiedad estadística llamada verosimilitud.
+
+Generalmente, los vectores de un mismo grupo (o clústers) comparten propiedades comunes.El conocimiento de los grupos puede permitir una descripción sintética de un conjunto de datos multidimensional complejo. De ahí su uso en minería de datos. Esta descripción sintética se consigue sustituyendo la descripción de todos los elementos de un grupo por la de un representante característico del mismo.
+
+El agrupamiento de datos puede desarrollarse con diferentes técnicas estadísticas, pero las más usuales y las que veremos en este capítulo de analisis exploratorio de datos son las tres siguientes:
+ 
+ 1. [El agrupamiento jerarquico (Hierarchical Clustering)](#hc)
+ 2. [K-means Clustering](#km)
+ 3. [Análisis de componentes principales](#PCA) 
+
+Estas herramientas nos ayudarán a explorara los datos brutos y reducir la dimension de los mismos hasta para poder obtener un modelo de comportamiento simplificado. 
+
+
+
+# Agrupamiento jerárquico (Hierarchical Clustering) <a name="hc"></a>
+
+En minería de datos, el agrupamiento jerárquico (**Hierarchical Clustering**) es un método de análisis que busca construir una **jerarquía** de grupos (o clustres) de forma automatizada a partir de lo juntos que estén los datos. La base del agrupamiento jerarquico es la funcion de dsitancia, que puede tener muchas interpretaciones además de la euclidea, y que nos servirá para calcular la matriz de distancias entre puntos previa al agrupamiento.
+
+
+```{r fig.height = 3, fig.width = 6, fig.align='center', echo=FALSE}
+#install.packages
+if (!require("png")) {
+   install.packages("png", dependencies = TRUE)
+   library(png)
+   }
+
+if (!require("grid")) {
+   install.packages("grid", dependencies = TRUE)
+   library(grid)
+}
+
+setwd("C:/R/proyectos/Data_Science_Coursera/04_EXPLORAR_Y_ANALIZAR_DATOS/")
+grid.raster(readPNG("figures/25.png"))
+```
+
+## Procedimiento para realizar el agrupamiento (funcion `hclust`)
+
+El proceso lo veremos para el caso más simple de una matriz de datos (x,y) que se corresponde con la observacion de dos variables:
+
+ 1. calculamos la distancia entre cada par de puntos para ver cual está más cerca de otro:
+	* `dist(data.frame(x=x, y=y)` = usamos para ello la funcion `dist`.
+	* Nota: La función `dist()` usa la distancia euclidea por defecto, pero puede especificarse otra en el argumento `method=`*
+ 2. En la matriz de distancias anterior, juntamos los dos puntos más cercanos y los sustituimos por un único punto agrupado.
+3. Volvemos al paso anterior buscando los siguientes 2 puntos más cercanos y los juntamos .. y así hasta agrupar todos los puntos en uno....
+4. El orden del agrupamiento se muestra en un **dendrograma**
+
+Un **dendrograma** es un tipo de representación gráfica o diagrama de datos en forma de árbol que organiza los datos en subcategorías que se van dividiendo en otros hasta llegar al nivel de detalle deseado.
+
+Observando las sucesivas subdivisiones podemos hacernos una idea sobre los criterios de agrupación, la distancia entre los datos según las relaciones establecidas, etc.
+
+Hay que tener presente que las agrupaciones son gráficos inestables en el sentido que - pequeños cambios en los puntos- pueden producir grandes cambios en la forma de agruparse. 
+
+También que el uso de diferentes métricas (funciones de distancia) conlleva diferentes resultados.
+
+Sin embargo las salidas de la funcion `hclust` son deterministas, en el sentido que los mismos argumentos de entrada, producen siempre la misma salida o resultado.
+
+Determinar cuantos cluster o agrupamientos hay no siempre es sencillo, pero son graficos apropiados para un análisis exploatorio de datos, que pueden permitirnos comprobar de un vistazo si existe o no patrones de comportamiento en los datos, o representar la similitud o relaciones de las variables entre sí.
+
+### Métodos de `hclust`  
+
+La funcion `hclust` puede utilizar dos argumentos `method = "complete"`(el usado por defecto) o `"method = average"`. Podemos traducirlos como uso de distacia completa o promedio.
+
+* average linkage = toma la distancia media ... centro de masas de los puntos de cada cluster
+* complete linkage = toma la distancia más alejada para cada par de puntos posible entre clusters
+* Nota: cada método antior produce un resultado diferente*
+
+La función `hh <- hclust(dist(dataFrame))` produce un **objeto** de agrupamiento jerarquico.
+	* `dist()` = por defecto es distancia Euclidea, calcula la distancia o similitud entre cada 2 observaciones de los datos; cuando se aplica sobre un data frame, la función aplica esta fórmula a cada par de datos: $\sqrt{(A_1 - A_2)^2 + (B_1 - B_2)^2 + ... + (Z_1 -Z_2)^2 }$ .Construye como resultado una matriz de distancias entre puntos (por fila - observaciones).
+		* El orden del agrupamiento se determina por estas distancias
+	* `plot(hh)` = pinta el dendrograma obtenido, en el que se ordenan automáticamente las columnas y filas según su pertenencia a una cluster o a otro.
+	* `names(hh)` = devuelve todos los nombres del objeto `hclust`
+		* `hh$order` = devuelve el orden de las filas/clusters del dendrograma
+		* `hh$dist.method` = devuelve el metodo usado para el cálculo de la distancia o similitud entre puntos.
+		
+* **Nota:** el dendrograma no dice cuantos cluster hay, para saber esto hay que hacer un corte en un nivel del mismo.
+
+### `hclust` Ejemplos 
+
+El proceso es siempre el mismo: 
+
+1. calcular la distancia.
+2. calcular el dendrograma.
+
+Veamos un ejemplo con datos generados aleatoriamente. Obtendremos como resultado el dendograma. 
+Para pintar solamente el dendrograma (sin adornos de titulos y labels) podemos usar la siguiente sentencia: `plot(as.dendrogram(hc))` tengamos en cuenta que la distancia por defecto que usa el dendrograma es la completa, es decir la distancia máxima entre los puntos de cada cluster, que es el valor que aparece como eje de ordenadas (y) del mismo. También pintaemos una linea de corte que nos divide el conjunto de datos en 3 clusters. 
+
+```{r fig.height = 3, fig.width = 4, fig.align='center'}
+set.seed(1234)
+x <- rnorm(12,mean=rep(1:3,each=4),sd=0.2)
+y <- rnorm(12,mean=rep(c(1,2,1),each=4),sd=0.2)
+#Creamos un data-frame
+dataFrame <- data.frame(x=x,y=y)
+#pintamos los puntos generados
+plot(x,y,col="blue",pch=19)
+#Añadimos etiquetas a los datos pintados
+text(x = x, y = y, labels = rownames(dataFrame), pos=4, col="red")
+
+#calculamos la distancia
+distxy <- dist(dataFrame)
+# Calculamos el agrupamiento con hclust
+hClustering <- hclust(distxy)  
+#hClustering <- hclust(distxy, method = "complete")# este es por defecto
+#hClustering <- hclust(distxy, method = "average")
+
+par(mfrow=c(1,2))
+#Pintamos el dendograma obtenido y los datos
+plot(hClustering)
+# pintamos el dendrograma sin titulos ni etiquetas
+plot(as.dendrogram(hClustering))
+abline(h=1.5, col="blue")
+
+```
+
+
+### `myplcclust` Función
+
+La función `myplcclust`, es una funcion a medida, programada para hacer más vistosas las salidas de `hclust`. Se consigue pintando y etiquetando cada dato según el cluster principal y asignando un  color por agrupación.
+
+Hay que saber como argumento el número de grupos inicial, por lo que debemos ejecutar `hclust`, y determinar el punto de corte del dendrograma.
+
+```{r myplclust}
+
+myplclust <- function(hclust, lab = hclust$labels,
+	lab.col = rep(1, length(hclust$labels)), hang = 0.1, ...) {
+	## modifiction of plclust for plotting hclust objects *in colour*! Copyright
+	## Eva KF Chan 2009 Arguments: hclust: hclust object lab: a character vector
+	## of labels of the leaves of the tree lab.col: colour for the labels;
+	## NA=default device foreground colour hang: as in hclust & plclust Side
+	## effect: A display of hierarchical cluster with coloured leaf labels.
+	y <- rep(hclust$height, 2)
+	x <- as.numeric(hclust$merge)
+	y <- y[which(x < 0)]
+	x <- x[which(x < 0)]
+	x <- abs(x)
+	y <- y[order(x)]
+	x <- x[order(x)]
+	plot(hclust, labels = FALSE, hang = hang, ...)
+	text(x = x, y = y[hclust$order] - (max(hclust$height) * hang), labels = lab[hclust$order],
+ col = lab.col[hclust$order], srt = 90, adj = c(1, 0.5), xpd = NA, ...)
+}
+```
+
+Veamos un ejemplo:
+
+```{r fig.height = 3, fig.width = 4, fig.align='center'}
+# Misma data frame que el ejemplo de hclust
+dataFrame <- data.frame(x = x, y = y)
+distxy <- dist(dataFrame) #calculo distancias 
+hClustering <- hclust(distxy) # calculo hclust
+# llamo a myplclust
+myplclust(hClustering, lab = rep(1:3, each = 4), lab.col = rep(1:3, each = 4))
+```
+
+## `heatmap` mapas de calor
+
+Un mapa de calor, es simplemente una matriz en la que se colorea cada elemento según el valor que toma. Se obtiene como resultado una pitura global e intuitiva de la variabilidad espacial de los datos.
+
+La función de R que hace esto se llama `heatmap(data.matrix)`, que es una función similar a `image(t(x))`. Es una buena forma de representar gráficos de muchas dimensiones o variables. La función realiza además el agrupamiento de `hclust` tanto por observaciones (= filas) como por variables (= columnas), por lo que aporta una salida gráfica que facilita el primer análisis exploratorio de conjuntos complejos de datos, y puede servir para encontrar patrones en los mismos.
+
+El argumento debe ser una __**matriz**__, por lo que es útil `as.matrix(data.frame)` para convertir en caso necesario.
+
+Lo que hace es realizar el agrupamiento jerárquico no solo por observaciones o filas como `hclust`, sino tambien en las columnas o variables, por lo que es como tomar las variables como subconjuntos de observaciones y vemos en una simple imagen qué variables son más cercanas o están más relacionadas que otras. Esto tiene más sentido con matrices de muchas variables.
+
+El mapa final se muestra por defecto en la escala de color del calor (del amarillo = máximos valores - al rojo = valores bajos) aunque estas opciones se pueden modificar y personalizar.
+Es importante resaltar que la escala de color se calcula por filas u observaciones, por lo que no es 
+
+```{r fig.height = 3, fig.width = 4, fig.align='center'}
+set.seed(12345)
+data <- matrix(rnorm(400), nrow = 40)
+# data tiene 40 filas y 10 col o variables
+heatmap(data)
+```
+
+Vamos a poner un ejemplo para entender mejor qué representa un heatmap.
+La idea es simple, se trata de comparar los valores por filas, pintando para cada fila de color amarillo los mayores valores y en rojo los menores __(ojo, en cada fila la escala de color cambia)__.
+
+```{r}
+set.seed(1234)
+x <- 1:12           #rnorm(12,mean=rep(1:3,each=4),sd=0.2)
+y[1:6] <- x[1:6]+1  #rnorm(12,mean=rep(c(1,2,1),each=4),sd=0.2)
+y[7:12]<-x[7:12]-1
+y[12]<-13
+z<-rep(5,12)
+dataFrame <- data.frame(x,y,z) 
+heatmap(as.matrix(dataFrame))
+
+```
+Una buena explicación de cómo hacer buenos heatmap en R está en esta web:  <http://sebastianraschka.com/Articles/heatmaps_in_r.html#clustering>. En esta web usan una funcion diferente para hacer los heatmap, que está en el paquete `gplots`. La funcion que usa se denomina `heatmap.2`, y la diferencia principal con la función `heatmap` es que la escala es la misma para todo el conjunto de datos, y no cambia por filas. Además permite muchos ajustes de personalización de los datos.
+Vamos a ver el ejemplo anterior hecho con `heatmap.2`
+
+```{r}
+if (!require("gplots")) {
+ install.packages("gplots", dependencies = TRUE)
+ library(gplots)
+ }
+# Convertimos a matriz
+mat<-as.matrix(dataFrame)
+
+heatmap.2(mat,
+  cellnote = mat,  # same data set for cell labels
+  main = "Correlation", # heat map title
+  notecol="black",      # change font color of cell labels to black
+  density.info="none",  # turns off density plot inside color legend
+  trace="none",         # turns off trace lines inside the heat map
+  margins =c(2,2),     # widens margins around plot 
+  dendrogram="row",     # only draw a row dendrogram
+  Colv="NA")            # turn off column clustering
+
+dev.off()
+```
+
+### Colores del heatmap
+se puede cambiar los colores de la paleta por defecto de varias maneras:
+`heatmap(dataMatrix, col=cm.colors(25))`
+
+Otra forma es crear una paleta nueva:
+```{r}
+if (!require("RColorBrewer")) {
+   install.packages("RColorBrewer", dependencies = TRUE)
+   library(RColorBrewer)
+}
+
+# Puedo llamar directamente a heatmap y pasar una paleta predefinida de color usando
+# las funciones predefinidas:
+##  rainbow(n, s = 1, v = 1, start = 0, end = max(1, n - 1)/n, alpha = 1)
+##  heat.colors(n, alpha = 1)
+##  terrain.colors(n, alpha = 1)
+##  topo.colors(n, alpha = 1)
+##  cm.colors(n, alpha = 1)  --  Create a vector of n contiguous colors
+
+heatmap(mat, col=cm.colors(25))
+heatmap(mat, col=terrain.colors(20))
+
+#defino una paleta de 10 colres a partir del rojo, amarilo y verde
+my_palette <- colorRampPalette(c("red", "yellow", "green"))(n = 10)
+heatmap(mat, col=my_palette)
+
+```
+
+### Función `image` 
+
+La función `image()` produce una salida identica a `heatmap()`,pero sin los dendrogramas.
+* `image(x, y, t(dataMatrix)[, nrow(dataMatrix):1])` 
+	* `t(dataMatrix)[, nrow(dataMatrix)]`
+		* `t(dataMatrix)` = traspuesta de dataMatrix, esto es para que se represente tal y como estan los datos, las x como observaciones y las y como variables
+			* ***Ejemplo*** una matriz de 40 x 10 tendrá un grafico de 10 columnas en x y 40 filas en y como valores. 
+		* `[, nrow(dataMatrix):1]` = hace un subgrupo de los datos de forma que se muestre en orden inverso por columnas(de la ultima col a la 1).cuando se combina con la funcion transponer `t()` , reordena las filas para mostrar del último al primero.
+			* ***Note**: sin esta sentencia los datos se representarían en orden del bajo al valor más alto.*
+	* `x`, `y` = usado para especificar los valores mostrados enlos ejes x e y.
+		* ***Nota**: debe ser en orden creciente *
+
+**Ejemplo**
+
+```{r fig.height = 4, fig.width = 3, fig.align='center'}
+set.seed(12345)
+data <- matrix(rnorm(400), nrow = 40)
+image(1:10, 1:40, t(data)[, nrow(data):1])
+```
+
+$\pagebreak$
+
+# K-means Clustering <a name="km"></a>
+
+Otra técnica de agrupamiento, muy antigua, es el llamado k-mean clustering. Es es similar al agrupamiento jerarquico anterior y proporciona una manera eficiente de agrupar datos multidimensionales y ver si existen patrones o similitud entre las observacines.
+
+K-means es un método de agrupamiento, que tiene como objetivo la partición de un conjunto de n observaciones en k grupos en el que cada observación pertenece al grupo cuyo valor medio es más cercano. Es un método utilizado en minería de datos.
+
+Al igual que el arupamiento jerarquico la principal variable para agrupar los datos es la definición de distancia, esta puede ser de muchos tipos, desde la euclídea a la correlacion entre datos o la distancia Manhattan o binaria etc.
+
+El algoritmo K-mean parte del conocimiento del __número de grupos inicial__ , y de unas coordenadas inciales para los centroides de cada agrupación. Esto es diferente respecto al jerarquico que identifica los grupos de manera automática a partir de la distancia de los datos.
+
+Iterativamente va a asignar los puntos a un grupo por su cercanía a los centroides (se asignan al grupo A los puntos más cercanos al centroide A), y recalcula iterativamente de nuevo el centroide en base a los puntos agrupados en cada subconjunto.
+
+Este algoritmo **no es deterministico**, pues parte de una agrupacion incial estimada y puede ofrecer diferentes resultados para los mismos parámetros iniciales y según el número de iteracciones que se realicen.
+
+
+## Procedimiento funcion (`kmeans`)
+El proceso iterativo de calculo del algoritmo K-Means es el siguiente:
+
+	1. Establece el número inicial de grupos (o clusters)
+	2. Establece un centroide aleatorio inicial de cada grupo
+	3. asigna a cada grupo los puntos más cercanos al centroide del grupo.
+	4. recalcula el centroide con los puntos asignados.
+	5. repite = vuelve alpaso 3.. y así
+	
+Este proceso requiere de partida:
+		* definir la distancia
+		* dar el número inicial de clusters
+		* sugerir la posición inicial de cada centroide para cada agrupación
+
+### Ejemplos
+
+```{r fig.height = 2, fig.width = 3, fig.align='center'}
+set.seed(1234)
+x <- rnorm(12,mean=rep(1:3,each=4),sd=0.2)
+y <- rnorm(12,mean=rep(c(1,2,1),each=4),sd=0.2)
+dataFrame <- data.frame(x=x,y=y)
+# especificamos el numero inicial de cluster como 3
+kmeansObj <- kmeans(dataFrame,centers=3)
+names(kmeansObj) # nos da los argumentos posibles de kmeans
+# calcula los clusters
+kmeansObj$cluster 
+#para pintar los resultados
+#par(mar=rep(0.2,4))
+#pintamos los puntos primero
+plot(x,y,col=kmeansObj$cluster,pch=19,cex=2)
+#despues pintamos los centroides de los clusters
+points(kmeansObj$centers,col=1:3,pch=3,cex=3,lwd=3)
+
+# kmeansObj$cluster = da el objeto cluster nos vale por ejemplo para distinguir los puntos en un plot
+# -----$centers = almacena los centroides
+# kmeansObj$iter = numero de iteracciones que ha hecho
+```
+
+$\pagebreak$
+
+# Análisis de componentes principales <a name="PCA"></a>
+
+En estadística, el análisis de componentes principales (en español ACP, en inglés, PCA) es una técnica utilizada para reducir la dimensionalidad de un conjunto de datos. Es decir, quitar la paja y quedarse con el grano.
+
+Técnicamente, el ACP busca la proyección según la cual los datos queden mejor representados en términos de mínimos cuadrados. Se convierte un conjunto de observaciones de variables posiblemente correlacionadas en un conjunto de valores de variables sin correlación lineal llamadas __**componentes principales**__.
+
+El ACP se emplea sobre todo en análisis exploratorio de datos y para construir modelos predictivos. El ACP comporta el cálculo de la descomposición en autovalores de la matriz de covarianza, normalmente tras centrar los datos en la media de cada atributo.
+
+Son 2 los principales objetivos de la reducción de dimensiones: 
+
+	1. Encontrar un nuevo subconjunto de variables que no estén correlacionadas y que expliquen el máximo de varianza posible de los datos.
+		* ACP \to normmalmente muchas de las variables no son independientes ( nos interesa quedarnos solo con las independientes) esto se llama analisis de componentes principales y es un problema estadístico.
+	2. Encontrar el menor rango de una matriz ( = la mejor matriz que con menor número de variables) que explique los datos. explique la varianza de los datos. 
+		* SVD \to Singular Value Decomposition (SVD)
+
+* ***Ejemplo***
+Vamos a crear artificialmente unos datos que tienen un patrón. Por ejemplo tiramos una moneda y si sale cara remplazamos los datos=observaciones de esta tirada con ceros y treses [0, 0, 0, 0, 0, 3, 3, 3, 3, 3].
+
+```{r fig.height = 3, fig.width = 7, fig.align='center'}
+set.seed(678910)
+data <- matrix(rnorm(400), nrow = 40)
+for(i in 1:40){
+  # lanza moneda al aire
+  coinFlip <- rbinom(1,size=1,prob=0.5)
+  # si sale cara sumo a los datos observados 0 y 3
+  if(coinFlip){
+    data[i,] <- data[i,] + rep(c(0,3),each=5)
+  }
+}
+# hierarchical clustering
+hh <- hclust(dist(data))
+
+plot(hh)
+heatmap(as.matrix(data))
+
+# ordenamos las filas por orden ascendente:
+dataOrdered <- data[hh$order,]
+heatmap(dataOrdered)
+# create 1 x 3 panel plot
+par(mfrow=c(1,3))
+# heat map (sorted)
+image(t(dataOrdered)[,nrow(dataOrdered):1])
+# row means (40 rows)
+plot(rowMeans(dataOrdered),40:1,xlab="Row Mean",ylab="Row",pch=19)
+# column means (10 columns)
+plot(colMeans(dataOrdered),xlab="Column",ylab="Column Mean",pch=19)
+#dev.off()
+```
+
+## Principios matemáticos de la descomposicion
+Tanto el analisis de componentes principales (principal component analysis (PCA)) como la descomposicion en valores singulares (singular value decomposition (SVD)) forman parte de la misma herramienta matematica de la que se puede ver una explicación en profundidad aquí <http://arxiv.org/pdf/1404.1100.pdf> 
+
+### SVD 
+La descomposición en valores singulares (SVD) de una matriz, es una factorización de la misma con muchas aplicaciones en estadística y otras disciplinas.
+
+Sea $X$ una matriz que contiene en cada columna una variables y en cada fila una observación. La descomposición de la matriz consisten en encontrar las 3 matrices que cumplan la forma siguiente $$X = UDV^T$$. Donde:
+
+	- $U$ = vector singular izquierdo, matriz ortogonal (columnas independientes unas de otras)
+	- $D$ = valores singulares,matriz diagonal
+	- $V$ = vector singular derecho, matriz ortogonal (columnas independientes unas de otras)
+ 
+Las columnas de U y las columnas de V son llamados vector singular izquierdo y vector singular derecho de $X$.
+
+
+- ***Nota**: ortogonalidad implica que la matriz es siempre invertible [$A^{-1} = A^T$] y que la multiplicación de la matriz con su transpuesta es la matriz identidad (diagonal todo unos, resto ceros) [$AA^T = I$] *
+	- ***Nota**: diagonal implies that any value outside of the main diagonal ($\searrow$) = 0 *
+		+ example $$A = \begin{bmatrix}
+       1 & 0 & 0 \\
+       0 & 2 & 0 \\
+       0 & 0 & 3 \end{bmatrix}$$
+* ***Nota**: scale of data matters for SVD/PCA (scaling the data may help), patterns detected maybe mixed together, and computation is intensive for these operations *
+
+## Principal Components Analysis (PCA)
+* first scale the variables and run SVD on normalized matrix
+	* **scaling** = subtract each column by its mean and divide by its standard deviation
+* **principal components** = the right singular values or the $V$ matrix
+
+### SVD y PCA Ejemplos
+* **$U$ y $V$ son matrices**
+	- `s <- svd(data)` = realiza un SVD en los datos ($n \times m$ matrix) y los separa en $u$, $v$, y $d$ matrices.
+		+ `s$u` = $n \times m$ matrix $\rightarrow$ variación horizontal
+		+ `s$d` = $1 \times m$ vector $\rightarrow$ vector de los valores singulares/diagonal.
+			* `diag(s$d)` = $m \times m$ matriz diagonal 
+		+ `s$v` = $m \times m$ matrix $\rightarrow$ variación vertical
+		+ `s$u %*% diag(s$d) %*% t(s$v)` = returns the original data $\rightarrow$ $X = UDV^T$
+	- `scale(data)` = escala los datos originales sustrayendo la media por columna, y dividiendo por la desviación estandar por columna.
+
+El resultado es similar a las graficas que hemos visto antes:
+
+```{r eval=FALSE}
+mat<-matrix(data=c(1,2,3,2,5,7),nrow = 2, ncol=3))
+svd(mat)
+# como resultado nos da un vector y 2 matrices
+#multiplicar matrices se hace con %*%
+
+matu %*% diag %*% t(matv)
+```
+
+
+
+
+```{r fig.height=3,fig.width=7, fig.align = 'center', eval=FALSE}
+# running svd
+#scale es un comando que normaliza los datos, les resta la media y divide por la desviacin estandar
+# para que todas las variables sean comparables
+svd1 <- svd(scale(dataOrdered))
+# create 1 by 3 panel plot
+par(mfrow=c(1,3), mar=c(2,4,0.1,0.1))
+# data heatmap (sorted)
+image(t(dataOrdered)[,nrow(dataOrdered):1])
+# U Matrix - first column
+plot(svd1$u[,1],40:1,xlab="Row",ylab="First left singular vector",pch=19)
+# V vector - first column
+plot(svd1$v[,1],xlab="Column",ylab="First right singular vector",pch=19)
+```
+
+Para explicar la variación de la varianza de una descomposición SDV tenemos como resultado el vector $D$. este vercor nos da la explicación en % de la varianza de los datos en cada variable o columna. Lo que es equivalente a normalizar los valores singulares y convertirlos en procentaje.
+
+	* $d$ matrix (`s$d` vector) captures the singular values, or ***variation in data that is explained by that particular component*** (variable/column/dimension)
+
+
+en el ejemplo anterior el primer valor explica el 40% de la varización de los datos.
+
+```{r eval=FALSE,fig.height=3,fig.width=5, fig.align = 'center'}
+# create 1 x 2 panel plot
+par(mfrow=c(1,2))
+# plot singular values
+plot(svd1$d,xlab="Column",ylab="Singular value",pch=19)
+# plot proportion of variance explained
+plot(svd1$d^2/sum(svd1$d^2),xlab="Column",ylab="Prop. of variance explained",pch=19)
+```
+
+El analisis de SVD y el PCA son básicamente la misma cosa, y lo demuestra con la siguente representación de los resultados:
+
+* **Relationship to PCA**
+	* `p <- prcomp(data, scale = TRUE)` = performs PCA on data specified
+		- `scale = TRUE` = scales the data before performing PCA
+		- returns `prcomp` object
+		- `summary(p)` = prints out the principal component's standard deviation, proportion of variance, and cumulative proportion
+	* PCA's rotation vectors are equivalent to their counterparts in the V matrix from the SVD
+
+```{r eval=FALSE,fig.height=4,fig.width=4, fig.align='center'}
+# SVD
+svd1 <- svd(scale(dataOrdered))
+# PCA
+pca1 <- prcomp(dataOrdered,scale=TRUE)
+# Plot the rotation from PCA (Principal Components) vs v vector from SVD
+plot(pca1$rotation[,1],svd1$v[,1],pch=19,xlab="Principal Component 1",
+	ylab="Right Singular Vector 1")
+abline(c(0,1))
+# summarize PCA
+summary(pca1)
+```
+
+PCA
+```{r eval=FALSE}
+# ESCALAR LOS DATOS
+mat1<-scale(mat)
+#SVD
+svd1<-svd(scale(mat))
+svd1$d #componentes principales
+
+#PCA
+prcomp(scale(mat))
+#esto debe coincidor con las columnas de v en el SVD svd1$v[,1]
+
+```
+los elementos de la diagonal evaluan la dimanesion de los datos, así un valor muy alto del primer número y casi cero para el resto indica que los elementos de la serie o matriz son de una dimensión.
+Para ver el numero de dimensiones de los datos, fijarse en el vector d de resultados del analisis svd$d....
+
+## relaciones complejas en los datos
+para buscar patrones complejos  y detectarlos es importante seguir una pautas antes de la comparación de SVD o PVA. 
+Lo primero es escalar los datos de forma que la varianza de cada col sea similar, es decir lo mejor sería normalizar los valores para que la comparación fuera coherente.
+
+* **More Complex Patterns**
+	* SVD can be used to ***detect unknown patterns*** within the data (we rarely know the true distribution/pattern about the population we're analyzing)
+	* however, it may be hard to pinpoint exact patterns as the principal components may confound each other
+		- in the example below, you can see that the two principal components that capture the most variation have both horizontal shifts and alternating patterns captured in them
+
+
+```{r eval=FALSE,fig.height=6,fig.width=7, fig.align='center'}
+set.seed(678910)
+# setting pattern
+data <- matrix(rnorm(400), nrow = 40)
+for(i in 1:40){
+  # flip a coin
+  coinFlip1 <- rbinom(1,size=1,prob=0.5)
+  coinFlip2 <- rbinom(1,size=1,prob=0.5)
+  # if coin is heads add a common pattern to that row
+  if(coinFlip1){
+    data[i,] <- data[i,] + rep(c(0,5),each=5)
+  }
+  if(coinFlip2){
+    data[i,] <- data[i,] + rep(c(0,5),5)
+  }
+}
+hh <- hclust(dist(data)); dataOrdered <- data[hh$order,]
+
+# perform SVD
+svd2 <- svd(scale(dataOrdered))
+par(mfrow=c(2,3))
+image(t(dataOrdered)[,nrow(dataOrdered):1])
+plot(rep(c(0,1),each=5),pch=19,xlab="Column", main="True Pattern 1")
+plot(rep(c(0,1),5),pch=19,xlab="Column",main="True Pattern 2")
+image(t(dataOrdered)[,nrow(dataOrdered):1])
+plot(svd2$v[,1],pch=19,xlab="Column",ylab="First right singular vector",
+	main="Detected Pattern 1")
+plot(svd2$v[,2],pch=19,xlab="Column",ylab="Second right singular vector",
+	main="Detected Pattern 2")
+```
+
+### Ejemplo
+Creamos una matriz de solo ceros y unos.
+Hacemos el analisis SVD y vemos que toda la variazión es explicada por el primer componente principal como es lógico.
+```{r eval=FALSE}
+constantMatrix<- matrix(rep(0,400), nrow = 40) #(dim 40x10)
+#creo una matriz que repite 5 ceros y 5 unos por fila 
+for(i in 1:dim(constantMatrix)[1]) {constantMatrix[i,]<-rep(c(0,1), each=5) }
+
+#realizo el analisis SVD
+svd1<-svd(constantMatrix)
+par(mfrow=c(1,3))
+
+image(t(constantMatrix)[,nrow(constantMatrix):1])
+plot(svd1$d, xlab="col", ylab="singula valor",pch=19)
+plot(svd1$d^2/sum(svd1$d^2), xlab="col", ylab="Prob. explicacion de varianza",pch=19)
+
+```
+
+
+## NA. Como tratar las ausencias de datos
+
+Antes de proceder con un estudio de componentes principales SVD tenemos que limpiar la matriz para eliminar los valores NA ausentes, ya que no se puede realizar el analisis con ausencia de datos en la matriz origen.
+
+Una solución es usar el paquete  `impute` de  [Bioconductor](http://bioconductor.org). Esto nos permite aproximar o asignar a los valores ausentes una media de los cercanos (como un krigging).
+
+La función `impute.knn` toma la observación sin dato y le asigna el valor  teniendo en cuenta las `k` observaciones más cercanas a esa fila ( el valor por defecto es `k=10`).
+
+```{r fig.height=3,fig.width=5, fig.align='center', eval=FALSE}
+#install.packages("impute")
+library(impute)  ## Available from http://bioconductor.org
+data2 <- matrix(rnorm(400), nrow = 40)
+# set random samples = NA
+data2[sample(1:100,size=40,replace=FALSE)] <- NA
+data2 <- impute.knn(data2)$data
+svd1 <- svd(scale(dataOrdered)); svd2 <- svd(scale(data2))
+par(mfrow=c(1,2))
+plot(svd1$v[,1],pch=19, main="Original")
+plot(svd2$v[,1],pch=19, main="Imputed")
+``` 
+
+
+## Ejemplo de SVD con imagen
+en este ejemplo vremos como funciona la reduccion de dimensiones SVD para -por ejemplo -comprimir una imagen real:
+
+* if we look at the variance explained plot below, ***most of the variation*** is explained by the ***first few principal components***
+
+```{r fig.height=3,fig.width=4, fig.align='center', eval=FALSE}
+# load faceData
+load("figures/face.rda")
+# perform SVD
+svd3 <- svd(scale(faceData))
+plot(svd3$d^2/sum(svd3$d^2),pch=19,xlab="Singular vector",ylab="Variance explained")
+```
+
+* approximations can thus be created by taking the first few components and using matrix multiplication with the corresponding $U$, $V$, and $D$ components `svd=u.t(v).d`
+
+```{r fig.height=2.5,fig.width=7, fig.align='center' , eval=FALSE}
+approx1 <- svd3$u[,1] %*% t(svd3$v[,1]) * svd3$d[1]
+approx5 <- svd3$u[,1:5] %*% diag(svd3$d[1:5])%*% t(svd3$v[,1:5])
+approx10 <- svd3$u[,1:10] %*% diag(svd3$d[1:10])%*% t(svd3$v[,1:10])
+# create 1 x 4 panel plot
+
+par(mfrow=c(1,4))
+# plot original facedata
+image(t(approx1)[,nrow(approx1):1], main = "1 Component")
+image(t(approx5)[,nrow(approx5):1], main = "5 Component")
+image(t(approx10)[,nrow(approx10):1], main = "10 Component")
+image(t(faceData)[,nrow(faceData):1], main = "Original")
+
+#funcion para pintar una imagen:
+#necesita jpg
+myImage<-function(iname){
+  par(mfrow=c(1,1))
+  par(mar=c(4,5,4,5))
+  image(t(iname)[,nrow(iname):1])
+}
+myImage(approx1)
+
+a1<-svd1$u[,1] %*% t(svd1$v[,1]) * svd1$d[1]
+myImage(a1)
+a2 <- svd1$u[,1:2] %*% diag(svd1$d[1:2]) %*% t(svd1$v[,1:2])
+myImage(a2)
+
+myImage(svd1$u[,1:5] %*% diag(svd1$d[1:5]) %*% t(svd1$v[,1:5]))
+
+```
+
+A matrix X has the singular value decomposition UDV^t. The principal components of X are ?
+ * the columns of V
+
+A matrix X has the singular value decomposition UDV^t. The singular values of X are found where?
+ * the diagonal elements of D
+
+## INSTALACION DE PAQUETES
+package 'spam' successfully unpacked and MD5 sums checked
+package 'maps' successfully unpacked and MD5 sums checked
+package 'fields' es un paquete que hace calculos espaciales 
+
+## SWIRL Clustering Example
+<http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones>
+"Human Activity Recognition database"
+The study creating this database involved 30 volunteers "performing activities of daily living (ADL)  while carrying a waist-mounted smartphone with embedded inertial sensors. ... Each person performed  six activities ... wearing a smartphone (Samsung Galaxy S II) on the waist. ... The experiments have been video-recorded to label the data manually.  The obtained dataset has been randomly partitioned  into two sets, where 70% of the volunteers was selected for generating the training data and 30% the test data.
+```{r eval=FALSE}
+dim(ssd)	
+names(ssd[,562:563])
+table(ssd$activity)
+#3 passive (laying, standing and sitting)
+sub1<-subset(ssd,subject==1)
+dim(sub1)
+
+
+par(mfrow=c(1, 2), mar = c(5, 4, 1, 1))
+plot(sub1[, 1], col = sub1$activity, ylab = names(sub1)[1])
+plot(sub1[, 2], col = sub1$activity, ylab = names(sub1)[2])
+legend("bottomright",legend=unique(sub1$activity),col=unique(sub1$activity), pch = 1)
+par(mfrow=c(1,1))
+
+mdist<-dist(sub1[,1:3])
+hclustering<-hclust(mdist)
+ 
+myplclust(hclustering,lab.col=unclass(sub1$activity))
+
+#probamos con la aceleracion maxima no la media como antes
+mdist<-dist(sub1[,10:12])
+hclustering<-hclust(mdist)
+myplclust(hclustering,lab.col=unclass(sub1$activity))
+svd1<-svd(scale(sub1[,-c(562,563)]))
+
+dim(svd1$u)
+#para ver los vectores singulares u svd1$u-- los que nos dicen la variacion por filas
+
+# los que dan la variacion por columnas son los de la derecha los V  las columnas de V svd1$v
+
+maxCon<-which.max(svd1$v[,2])
+mdist <- dist(sub1[,c(10:12,maxCon)])
+hclustering<-hclust(mdist)
+myplclust(hclustering, lab.col=unclass(sub1$activity))
+
+
+# Hacemos el kmean
+kClust<-kmeans(sub1[,-c(562,563)], centers=6)
+table(kClust$cluster,sub1$activity)
+
+#como depende de los centroides de inicio otra opcon es hacer 100 simulaciones y coger la mejor:
+kClust<-kmeans(sub1[,-c(562,563)], centers=6,nstart = 100)
+dim(kClust$centers)
+laying<-which(kClust$size==29)
+
+plot(kClust$centers[laying,1:12], pch=19, ylab="Laying Cluster"
+
+ walkdown <- which(kClust$size==49)
+plot(kClust$centers[walkdown,1:12], pch=19, ylab="Walkdown Cluster")
+```
+

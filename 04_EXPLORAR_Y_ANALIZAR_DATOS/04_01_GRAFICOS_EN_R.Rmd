@@ -1103,8 +1103,7 @@ install_from_swirl("Exploratory Data Analysis")
 swirl()
 
 ```
-
-points(cx,cy,col=c( "red", "orange","purple"), pch=3, cex=2,lwd=2)
+Todas las practicas de swirl están disponibles en GitHub: <https://github.com/DataScienceSpecialization/courses/>
 
 
 Hay 5 lecciones para el curso 4.

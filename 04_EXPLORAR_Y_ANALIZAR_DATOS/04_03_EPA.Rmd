@@ -1,0 +1,272 @@
+---
+title: "EPA"
+author: "Fernando Villalba"
+date: "20 de febrero de 2017"
+output: 
+  pdf_document: 
+    fig_caption: yes
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+---
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(eval=TRUE,echo=TRUE,warning = FALSE,error = FALSE,message = FALSE)
+```
+# AIR POLLUTION CASE STUDY
+
+Este ejemplo práctico se basa en los datos de la EPA de calidad del Aire en los EEUU [Descarga de datos EPA](https://www.epa.gov/outdoor-air-quality-data) 
+
+La primera pregunta que nos hacemos es si se han reducido o no los niveles de particulas en el aire desde la publicación de la Ley de proteccion del Aire en EEUU.
+
+Tenemos datos medidos desde 1999, hasta la actualidad que además están disponibles de manera gratuita en la web:
+
+Nos dicen que nos conectemos a la web de la EPA y bajemos los datos de 2012 y de 1999 que contengan los datos de PM2.5 "Local CoOnditions".
+Nos preguntan cual es el AQS o código de 5 digitos que corresponde al parámetro PM2.5.
+Ha cambiado la web, pero viendo un ejemplo para una ciudad, <https://www.epa.gov/outdoor-air-quality-data/pm25-continuous-monitor-comparability-assessments> he visto que es el 88101, 
+
+![imagen de datos EPA y códigos](imag/broker.gif)
+
+Una vez descargados los datos, nos dice que estos contienen dos ficheros uno con los datos *.txt y un pdf con la documentación.
+
+## primer vistazo
+ua el comando `ls` para listar. Y `less` para ver el fichero, aunque yo no consigo saber de qué paquete es este ultimo.
+Luego para busca si hay filas del tipo RC usa `grep ^RC nom_fichero.txt`
+
+Para leer el fichero usaremos el comando `read.table()`
+```{r}
+# leemos el fichero de texto
+pm0<- read.table("nombre_fichero.txt", comment.char = "#",header = FALSE, sep = "|", na.strings = "")
+# vemos la dimension del fichero
+dim(pm0)
+# vemos las primeras lineas
+head(pm0)
+
+# vamos a asignar los nombres de las columnas, que vemos que estaban en la primera fila del fichero
+cnames<- readLines("nombre_fichero.txt",1) # lee la fila 1
+# vemos que los nombres están separados por |, hacemos un 
+# split de los datos
+cnames<-strsplit(cnames, "|", fixed = TRUE)
+# asignamos como nombres de col el primer elemento de la lista de cnames
+names(pm0)<-cnames[[1]]
+
+# si todo está bien comprobamos haciendo un 
+head(pm0)
+
+# vemos que hay nombres de columna que se componen de 2 palabras
+# estos casos en conveniente transformarlos y quitar espacios en blanco
+# usamos la funcion make.names() que hace eso.. sustituye espacios por puntos
+names(pm0)<- make.names(cnames[[1]])
+#names(pm0)<-make.names(cnames[[1]][wcol])
+# comprobamos con un head
+head(pm0)
+
+#############
+# vamos a ver la col que no interesa la de los datos de PM2.5
+x0<-pm0$Sample.Value
+class(x0) # comprobamos que es numerica
+str(x0) # vemos un resumen
+summary(x0) # otro resumen con la media  percentiles
+
+# vemos que hay muchos NA, para calcular qué % de NA tenemos hacemos una simle
+# la media calcula la suma de trues NA entre el total... que es = al %
+mean(is.na(x0)) #nos da un 11% de NA
+
+```
+Llegados a este punto se plantea si es un problema o no tener un porcentaje de valores perdidos del 11% en la respuesta a la pregunta que deseamos.
+Recordemos que la pregunta es ¿ se ha reducido o aumentado la contaminación desde 1999 a 2012, medida como PM2.5 ?
+
+Para ello vamos a leer ahora los datos de 2012 y comparar co ls de 1999, ya que seguramente en 1999 había menos estaciones de control y menos datos y quizás mas NA que en la actualidad.
+Leemos los datos del otro fichero y los guardamos en otra variables pm1 (2012)
+```{r}
+pm1<- read.table("nombre_fichero.txt", comment.char = "#",header = FALSE, sep = "|", na.strings = "")
+
+# como los nombres de las col son los mismos 
+names(pm1)<- names(pm0)
+# o tambien 
+names(pm1)<- make.names(cnames[[1]])
+head(pm1)
+x1<-pm1$Sample.Value
+str(x1)
+
+# vamos a comparar 1999 con 2012
+summary(x1)
+summary(x0)
+
+# viendo el resumen de los datos vemos que la media ha bajado desde 1999 hasta 2012, por lo que parece que de media ha decrecido la contaminación .
+# vemos que hay una enorme cantidad de datos perdidos e 2012, pero sin embargo en % es menos del 6%, y por tanto menos del 11 % de 1999.
+mean(is.na(x1))
+```
+
+Una de las preguntas nos dicen cuanto ocupará una matirz de 1300000 x 28 .
+Dejo esta funcion en la que se estima el espacio ocupado por la misma:
+
+```{r estima_mem}
+# Función que estima la cantidad de memoria usada por una matriz
+predict_data_size <- function(numeric_size, number_type = "numeric") {
+  if(number_type == "integer") {
+    byte_per_number = 4
+  } else if(number_type == "numeric") {
+    byte_per_number = 8 #[ 8 bytes por numero]
+  } else {
+    stop(sprintf("Unknown number_type: %s", number_type))
+  }
+  estimate_size_in_bytes = (numeric_size * byte_per_number)
+  class(estimate_size_in_bytes) = "object_size"
+  print(estimate_size_in_bytes, units = "auto")
+}
+
+# Ejemplos
+predict_data_size(1304287*28, "numeric")
+predict_data_size(1518*1518, "numeric")
+predict_data_size(1518*1518, "integer")
+
+```
+
+Seguimos con la comparacion de las dos variables de los años 1999 y 2012.
+Una buena forma es hacer unos gráficos
+```{r}
+# graficos de caja
+boxplot(x0,x1)
+# vemos que hay valores extremadamente altos en el 2012, que llegan hasta los 900
+#por ello una buena solución es hacer la grafica logarítmica
+boxplot(log10(x0),log10(x1))
+# se generan avisos porque hay valores negativos que son omitidos de esta grafica log10
+# vemos que aunque se ha reducido algo la media, ha aumentado mucho
+# la variación o el rango de los datos
+```
+hemos visto que hay muchos datos negativos en el fichero, esto es muy extraño, pues or la forma de medir la variable (por peso) no puede haber valores negativos en los datos.
+Vamos por tanto a estudiar especialmente los negativos
+
+```{r}
+#creo un vector con TRUE en los valores negativos de x1
+negative<- x1<0 
+sum(negative, na.rm=TRUE) # nos da la suma de valores negativos
+mean(negative, na.rm = TRUE) # en % un 2% 
+# vamos a ver si tiene algo que ver con la fecha en la que se miden
+dates<- pm1$Date
+str(dates)
+dates<-as.Date(as.character(dates),"%Y%m%d")
+str(dates) # ahora los tengo como fechas no como caracteres
+# vamos a ver un grafico de las fechas
+hist(dates, "month") 
+# vemos que a mayoría de los datos se toman en primavera y pocos en verano
+# vamos a ver donde están en el año los negativos
+hist(dates[negative], "month") 
+# no parece que tenga relación..
+
+```
+Para no entrar en estos problemas globales, vamos a centraranos en una unica ubicación, en la que tengamos datos desde 1999 y hasta 2012, y así evitamos problemas más profundos relacionados con el incremento de puntos de medida desde entonces.
+Nos fijaremos en NY
+
+```{r}
+site0<- unique(subset(pm0, State.Code=36, c(County.Code,Site.ID)))
+site1<- unique(subset(pm1, State.Code=36, c(County.Code,Site.ID)))
+
+head(site0)
+
+site0 <- paste(site0[,1], site0[,2], sep = ".")
+site1 <- paste(site1[,1], site1[,2], sep = ".")
+
+str(site0)
+str(site1)
+# buscamos la interseccion de ambos conjuntos para ver sitios que no han cambiado el numero de medidores en estos años
+
+both <- intersect(site0, site1)
+#  con esto hemos localizado 10 monitores que no han cambiado y que podemos usar 
+
+# creamos una nueva columna con este dato para distinguir los monitores comunes encontrodos
+pm0$county.site<- with(pm0, paste(County.Code, Site.ID, sep="."))
+pm1$county.site<- with(pm1, paste(County.Code, Site.ID, sep="."))
+
+# ahora seleccionamos una tabla que contenga solo los monitores comunes en ambas tablas
+cnt0<- subset(pm0, State.Code== 36 & county.site %in% both)
+cnt1<- subset(pm1, State.Code== 36 & county.site %in% both)
+head(cnt0)
+# ahora vamos a separar slit por observaciones en cada monitor para poder comparar
+split(cnt0, cnt0$county.site)
+# queremos saber cuantas observaciones hay en cada monitor
+sapply(split(cnt0, cnt0$county.site), nrow)
+# lo hacemos para el otro
+sapply(split(cnt1, cnt1$county.site), nrow)
+# vemos que el sensor 63.2008 tiene mas o menos los muchos datos tanto en 1999 y en 2012, lo seleccionamos
+# vemos algo raro, pues hay menos observaciones en 2012 que en 1999
+pm1sub<- subset(pm1, State.Code==36 & County.Code == 63 & Site.ID== 2008)
+pm0sub<- subset(pm0, State.Code==36 & County.Code == 63 & Site.ID== 2008)
+
+dim(pm1sub)
+dim(pm0sub)
+
+x0sub <- pm0sub$Sample.Value
+x1sub <- pm1sub$Sample.Value
+
+## vamos a hacer una gráfica en el tiempo
+dates1<- pm1sub$Date
+x1sub <- pm1$Sample.Value
+plot(dates1,x1sub)
+# para que se pinte correctamente vamos a transformar en fecha
+dates0<-as.Date(as.character(pm0sub$Date),"%Y%m%d")
+dates1<- as.Date(as.character(dates1),"%Y%m%d")
+plot(dates1,x1sub)
+
+dates0<- pm0sub$Date
+dates0<- as.Date(as.character(dates0),"%Y%m%d")
+x0sub <- pm1$Sample.Value
+plot(dates0,x0sub)
+
+# panel plot
+par(mfrow=c(1,2),mar=c(4,4,2,1))
+plot(dates0,x0sub, pch=20)
+#añado la media
+abline(h=median(x0sub,na.rm=T))
+
+plot(dates1,x1sub, pch=20)
+#añado la media
+abline(h=median(x1sub,na.rm=T))
+abline(h=median(x0sub,na.rm=TRUE),lwd=2)
+
+# tenemos que poner la misma escala en los 2 graficos
+rng <- range(x0sub, x1sub, na.rm=T) # esto nos da el rango para pintar ambas
+# 3 - 40,1
+# repintamos
+par(mfrow=c(1,2))
+plot(dates0,x0sub, pch=20, ylim=rng)
+abline(h=median(x0sub,na.rm=T))
+plot(dates1,x1sub, pch=20, ylim=rng)
+abline(h=median(x1sub,na.rm=T))
+```
+Es interesante comprobar que no solo se ha bajado la media, sino que se ha reducido mucho la variabiliad y rango de los datos.
+
+
+## Valores por Estado
+
+Ahora vamos a pintar las medias por Estado entre una fecha y otra, es decir la media por la columna `State.Code` e pm0 de los valores de la columna `Sample.Value`.
+esto es un trabajo ideal para la funcion tapply(vector,factor_igual_lon_que_vector, funcion )
+  
+```{r}
+mn0<- with(pm0, tapply(Sample.Value, State.Code, mean,na.rm=T))
+str(mn0)
+summary(mn0)
+
+mn1<- with(pm1, tapply(Sample.Value, State.Code, mean,na.rm=T))
+str(mn1)
+summary(mn1)
+# vemos claramente que la media y los valoreshan bajado
+#queremos pintarlo
+d0<-data.frame(state = names(mn0), mean = mn0)
+d1<-data.frame(state = names(mn1), mean = mn1)
+head(d0)
+# juntamos ambas data frame con merge
+mrg <- merge(d0,d1,by="state")
+head(mrg) # se ha perdido un estado virgin island pues no esta en uno de las tablas
+
+par(mfrow=c(1,1))
+with(mrg, plot(rep(1999,52),mrg[,2], xlim=c(1998,2013)))
+with(mrg, points(rep(2012,52),mrg[,3]))
+# conectar los datos
+segments(rep(1999,52),mrg[,2],rep(2012,52),mrg[,3])
+
+# para buscar cuales son los que han incrementado
+mrg[mrg$mean.x < mrg$mean.y, ] 
+```
+
+Para ver los códigos de los estados buscar aquí <https://www.epa.gov/enviro/state-fips-code-listing>
