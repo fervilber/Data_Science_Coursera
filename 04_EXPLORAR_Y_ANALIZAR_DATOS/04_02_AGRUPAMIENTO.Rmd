@@ -700,3 +700,8 @@ plot(kClust$centers[laying,1:12], pch=19, ylab="Laying Cluster"
 plot(kClust$centers[walkdown,1:12], pch=19, ylab="Walkdown Cluster")
 ```
 
+
+## ENLACES 
+
+* [caso de estudio de PCA](http://gforge.se/2013/04/using-the-svd-to-find-the-needle-in-the-haystack/)
+* 

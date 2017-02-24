@@ -267,3 +267,22 @@ hist(df$y, xlab="eje X", main="titulo del grafico", col="red")
 dev.off()
 ```
 
+# 2 escalas
+Para pintar dos escalas en un grafico simple
+
+
+```{r}
+boxplot(y ~ z, data=df, 
+            varwidth=TRUE, 
+            col="lightgray", 
+            xlab ="Year", 
+            ylab ="log10(PM 2.5 Emissions)", 
+            main="Dust PM2.5 \nDecreased Year comparision")
+abline(h=0, col="grey")
+# añado otro grafico
+par(new = T)
+#especifico que el exes =false
+barplot(z,col="blue",space=0.3,axes=F, xlab=NA, ylab=NA)
+axis(side=4, at = pretty(range(z))))
+
+```

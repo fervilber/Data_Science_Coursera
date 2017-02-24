@@ -119,7 +119,7 @@ predict_data_size <- function(numeric_size, number_type = "numeric") {
 predict_data_size(1304287*28, "numeric")
 predict_data_size(1518*1518, "numeric")
 predict_data_size(1518*1518, "integer")
-
+predict_data_size(6500000*5,"numeric")
 ```
 
 Seguimos con la comparacion de las dos variables de los años 1999 y 2012.

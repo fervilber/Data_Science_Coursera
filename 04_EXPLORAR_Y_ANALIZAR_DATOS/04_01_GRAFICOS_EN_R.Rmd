@@ -4,9 +4,10 @@ author: "Fernando Villalba"
 date: "25 de enero de 2017"
 output:
   pdf_document:
-    fig_caption: yes
-    fig_width: 3
-    highlight: pygments
+    fig_crop: no
+    fig_height: 3
+    fig_width: 5.5
+    highlight: tango
     toc: yes
     toc_depth: 4
   html_document:
@@ -17,6 +18,7 @@ output:
 
 ```{r setup,echo=FALSE}
 knitr::opts_chunk$set(eval=FALSE,echo=TRUE,warning = FALSE,error = FALSE,message = FALSE)
+knitr::opts_chunk$set(fig.align='center')
 
 ```
 ## INDICE
@@ -28,16 +30,14 @@ knitr::opts_chunk$set(eval=FALSE,echo=TRUE,warning = FALSE,error = FALSE,message
 6. [Plot](#BS)
 
 
-** GRÁFICOS SIMPLES EN R **
+# INTRODUCCIÓN A LOS GRÁFICOS DE EXPLORACION DE DATOS CON R <a name="l1"></a>
 
-Esta es la primera lección del curso cuarto de la especialización en DATA SCIENCE.
+Lección del curso cuarto de la especialización en DATA SCIENCE.
 Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, donde se explica el uso de gráficos en R.
 
 Este curso se centra en el [analisis exploratorio de datos](<https://es.wikipedia.org/wiki/An%C3%A1lisis_exploratorio_de_datos).
 
 El análisis exploratorio de datos definido por John W. Tukey (E.D.A.: Exploratory data analysis) es, básicamente, el tratamiento estadístico al que se someten las muestras recogidas durante un proceso de investigación en cualquier campo científico. Para mayor rapidez y precisión, todo el proceso suele realizarse por medios informáticos, con aplicaciones específicas para el tratamiento estadístico. Los E.D.A., no necesariamente, se llevan a cabo con una base de datos al uso, ni con una hoja de cálculo convencional; no obstante el programa SPSS y R (lenguaje de programación) son las aplicaciones más utilizadas, aunque no las únicas.
-
-# INTRODUCCIÓN A LOS GRÁFICOS DE EXPLORACION DE DATOS CON R <a name="l1"></a>
 
 Cuando estamos tratando con datos, lo primero que hacemos para comprenderlos y empezar a familiarizarnos con su estructura es crear gráficas de exploración, sencillas, burdas, incluso sucias, que nos permiten ver rápidamente aspectos generales de los datos que tratamos de investigrar.
 
@@ -69,128 +69,118 @@ Cuando vamos a representar datos, tenemos tambien que pensar qué salida queremos
 El tipo de salida lo veremos en el apartado de dispositivos gráficos y puede ser importante si piensas usar los graficos no solo en la pantalla, sino para presentaciones o libros.
 
 En las lecciones del curso web se usa una tabla de datos extraida de la web de la agencia EPA de EEUU. Desde su web [EPA Air Quality System](https://www.epa.gov/aqs) podemos descargar los datos de ejemplo, que se corresponden con datos de calidad del aire en cada condado de  EEUU.
-
-```{r eval=FALSE}
-# Lectura del fichero con los datos para los ejemplos
-pollution <- read.csv("data/avgpm25.csv", colClasses=c("numeric", "character","factor","numeric","numeric"))
-head(pollution)
-
+```{r eval=TRUE, echo=FALSE}
+    setwd("C:/R/proyectos/Data_Science_Coursera/04_EXPLORAR_Y_ANALIZAR_DATOS/")
 ```
-Para estos apuntes, hemos usado los datos de ejemplo incluidos en la librería `datasets`, en concreto la tabla 'cars`.
+
+```{r eval=TRUE}
+# Lectura del fichero con los datos EPA  para los ejemplos
+    pollution <- read.table("avgpm25.csv", header =TRUE,
+        colClasses=c("numeric", "character","factor","numeric","numeric"))
+    head(pollution, 3)
+```
+Para estos apuntes hemos usado además, los datos de ejemplo incluidos en la librería `datasets`, en concreto la tabla 'cars`.
 
 
 ## Gráficos simples de 1 variable <a name="g1d"></a>
 
-Para explorar datos simples de una variable de forma rápida y dibujarlos, podemos usar estas características o funciones de R:
+La forma más sencilla de ver los datos de una tabla es haciendo una gráfica rápida y sencilla de las variables importantes de la misma. Empezaremos con los gráficos más sencillos de una variable, para ello la forma más rápida es usar alguna de las siguientes funciones de R:
 
 1. *summary(data)* que devuelve el min, max, media, mediana y 2 cuantiles, no pinta pero siempre es bueno resumir.
 2. *boxplot(data, col="blue")* --> hace un gráfico simple con los datos de summary y una caja color azul en este caso que continene el 50% de los datos (entre el 25 y e 75%)
 3. *hist(data, col ="green", breaks=10 )*, hace la grafica del histograma de frecuencias en 10 partes. Se puede omitir breaks. Puedes añadir una marca de los datos con rug(pollution$pm25)
 4. *barplot(data, col=wheat)* hace gráfico de barras color trigo
 
-Veamos unos ejemplos de código:
-
-```{r eval=TRUE,fig.height = 3, fig.width = 5, fig.align='center'}
-#Si no queremos o tenemos el fichero de EPA podemos usar datos de muestra del paquete datasets 
-library(datasets) # cargamos el paquete de datos de muestra
-head(cars)
-dim(cars)
-# sresumen de una de las variables
-summary(cars$speed) # da el min, 25%,mediana=50%, media, 75%, max
-quantile(cars$speed)
-
-boxplot(cars$speed, col="blue")
-#si queremos añadir una linea al boxplot, por ejemplo para marcar el limite de 12
-abline(h=12)
-
-hist(cars$speed, col="green")
- #podemos añadir una regla abajo del hist con todos los puntos
- # añadiendo rug SOLO VALE PARA 1D. nos pone una marca en cada punto de dato
-rug(cars$speed)
-names(cars)#para saber los nombres de las variables en la tabla cars
-
-#Generamos datos aleatorios
-x<-rnorm(100)
- # añadimos cortes.
-hist(x, col="green", breaks=5)
-rug(x)
-
- #añadimos linea vertical
-abline(v= 1, lwd=2) # grosor 2)
- #añadimos linea vertical en la media
-abline(v= median(x), col= "magenta", lwd=4) 
- # lwd=line_width=grosor 2)
- # lty=tipo linea
-
-#barplot(table(pollution$region), col="wheat", main="numero de condados por region")
+Veamos unos ejemplos de código, en los que dibujamos un boxplot o grafica de cajas que representa de forma sencilla una variable y un histograma de frecuencias de la misma
+```{r eval=TRUE}
+    library(datasets) # cargamos el paquete de datos de muestra
+    head(cars,4);dim(cars) # vemos los primeros 4 elementos y las dimensiones de la tabla
+# Resumen de una de las variables o col de la tabla
+    summary(cars$speed) # da el min, 25%,mediana=50%, media, 75%, max
+    quantile(cars$speed) # los cuantiles
+    names(cars) # nos devuelve los nombres de las variables en la tabla cars
+# 1ª GRAFICA EXPLORATORIA: BOXPLOT 
+    boxplot(cars$speed, col="lightgrey")
+# Si queremos añadir una linea al boxplot, por ejemplo para marcar el limite de 12
+    abline(h=7, lty=3, lwd=2)
+# 2ª GRAFICA EXPLO. HISTOGRAMA DE UNA VARIABLE    
+    hist(cars$speed, col="green")
+    # La funcion rug() pinta una marca bajo cada punto de datos 
+    # graficas de histograma 1 dimension
+    rug(cars$speed)
 ```
 
-Para añadir un gráfico sobre el anterior, podemo usar el atributo add=TRUE
-Por ejemplo para crear varios histogramas uno encima del otro
-```{r eval=TRUE,fig.height = 3, fig.width = 5, fig.align='center'}
-set.seed(42)
-par(mfrow=c(1,2))
-p1 <- hist(rnorm(500,4))                     # centered at 4
-p2 <- hist(rnorm(500,6))                     # centered at 6
-plot( p1, col=rgb(0,0,1,1/4), xlim=c(0,10))  # first histogram
-plot( p2, col=rgb(1,0,0,1/4), xlim=c(0,10), add=T)
+Para pintar dos histogramas juntos podemos usar el atributo `add=TRUE`.
+Veamos un ejemplo en el que generamos 2 series aleatorias de 500 observaciones y medias 4 y 6. Usamos en los colores elcomando `alpha=0.5` para generar transparencia.
 
-# o todo en la misma linea
-set.seed(42)
-hist(rnorm(500,4),xlim=c(0,10),col='skyblue',border=F)
-hist(rnorm(500,6),add=T,col=scales::alpha('red',.5),border=F)
-dev.off()
+```{r eval=TRUE}
+    set.seed(42) # iniciamos semilla aleatoria
+    # Pintamos la 1 grafica
+    hist(rnorm(500,4),xlim=c(0,10),col='skyblue',border=F, 
+         main="Juntar dos histogramas", xlab="x" , ylab="frecuencia")
+    # Pintamos segunda grafica encima
+    hist(rnorm(500,6),add=T,col=scales::alpha('red',.5),border=F, xlab="x") 
+   
 ```
 
-## Gráficos 2D <a name="g2d"></a>
-Si añadimos más variables a la gráfica usaremos funciones como `boxplot` o `with`.
+## Gráficos más complejos <a name="g2d"></a>
 
-```{r eval=FALSE}
-# grafico por region de los datos (tecla 4 altgr ~)
-boxplot(pm25 ~ region , data= pollution, col="red")
-# boxplot(speed ~ dist, cars)
+Para echar un ojo a varias variables al mismo tiempo y compararlas usaremos funciones como `boxplot` o `with`.
+Por ejemplo cuando comparamos dos variables x ~ y es muy útil la función `with(dataframe, plot(x,y,...))`
+donde la `x` e `y` se sustituyen por nombres de columnas en la dataframe.
+Una fórmula parecida usa la función `boxplot(x~y,data=dataframe, ...)`.
+```{r eval=TRUE, warning=FALSE}
+# Grafica X~Y usando los datos de la df cars
+    with(cars, plot(speed,dist,col=rgb(0,.5,.5,0.3),pch=19, cex=2)) # cex= tamaño 2x puntos
+# Tambien boxplot vale para pintar varias series
+    micolor <- rainbow(7, v=0.5,alpha=0.1)
+    boxplot(dist ~ speed ,data=cars, col=micolor, xlab="distancia",
+        ylab="velocidad", main= "comparar distancia vs velocidad")
 ```
+## Múltiples gráficos
 
-Existe la opción de dividir el lienzo en varios graficos con las opciones de `par()`.
+Existe la opción de dividir el lienzo en varios apartados con las múltiples opciones de la función `par()`.
+que detallaremos más adelante, pero resaltamos `mfrow=c(num_filas,num,col)` pues es muy usada para crear multigraficas juntas. Duvide el lienzo en subgraficas según el numeor de filas y col marcados.
+Veamos un ejemplo simple:
 
-```{r eval=FALSE}
-# dos histogramas
+```{r eval=TRUE, warning=FALSE}
+# 
 # dividimos la ventana grafica en 2 filas 1 col
-par(mfrow=c(2,1), mar=c(4,4,2,1)) 
-hist(subset(pollution, region=="east")$pm25, col="green")
-hist(subset(pollution, region=="west")$pm25, col="blue")
+    par(mfrow=c(2,2), mar=c(4,4,2,1)) # 2 filas x 2 col, mar=c(bottom, left, top, right)
+    hist(subset(pollution, region=="east")$pm25, col="lightgreen", main="Hist_1")
+    hist(subset(pollution, region=="west")$pm25, col="lightblue", main="Hist_2")
+    with(pollution, plot(pm25,pollution$longitude,col=rgb(0,.2,.2,0.3),pch=19, cex=1)) 
+    boxplot(pollution$pm25,col="lightgrey",horizontal=TRUE)
+    dev.off() #salimos del entorno multigrafico
 ```
 
-### Gráficos de dispersión (SCATTERPLOT)  <a name="sc"></a>
-Otra manera de representar datos de dos en dos es con graficas de dispersión o scatterplot en inglés.
+## Gráficos de dispersión (SCATTERPLOT)  <a name="sc"></a>
 
-Para hacerlas en R usamos dos funciones principales `plot` y `with`
+Otra forma común de pintar datos es usando las gráficas de dispersión o scatterplot en inglés.
+Para hacerlos en R usamos dos funciones  `plot` y `with`
 
 1. `plot(y ~ x, data = unatabla)` o `plot(x,y, col=x1)`  
     el símbolo ~ se hace con la tecla AltGr + 4.
 2. `with(unatabla, plot(y, x))`
 
-```{r eval=FALSE}
-with(pollution,plot(latitude,pm25))
-abline(h=12,lwd=2,lty=2)
+Se trata de funciones poderosas, pues automáticamente nos sirve tambien para distinguir valores según un factor.
+Es decir que podemos pintar de distintos colores y agrupar datos según una de las variables, si es o transformamos esta variable en un fator. 
 
-# ahora distinguimos por colores las regiones
-with(pollution,plot(latitude,pm25, col=region ))
-abline(h=12,lwd=2,lty=2)
-
+```{r eval=TRUE}
+# creamos una multigrafica de 1x2 
+    par(mfrow=c(1,2))
+# pintamos los datos x~y
+    with(pollution,plot(latitude,pm25,col=micolor, pch=20))
+    abline(h=12,lwd=2,lty=2)
+# Ahora hacemos lo mismo pero distinguiendo por colores según la variable region.
+    with(pollution,plot(latitude,pm25, col=region, pch=20))
+    abline(h=12,lwd=2,lty=2)
+    dev.off()
 ## multiples scatterplots
-par(mfrow=c(2,1), mar=c(5,4,2,1)) 
-with(subset(pollution, region=="west"),plot(latitude,pm25, main="WEST"))
-with(subset(pollution, region=="east"),plot(latitude,pm25, main="EAST"))
-
-#otra forma de hacer scatter plots 
-plot(pollution$latitude, ppm, col = pollution$region)
-abline(h=12,lwd=2,lty=2)
-
-
-west <- subset(pollution,region=="west")
-plot(west$latitude,west$pm25,main="West")
-plot(east$latitude, east$pm25, main = "East")
+    par(mfrow=c(2,1), mar=c(5,4,2,1)) 
+        with(subset(pollution, region=="west"),plot(latitude,pm25, main="WEST"))
+        with(subset(pollution, region=="east"),plot(latitude,pm25, main="EAST"))
+    dev.off()
 ```
 
 # DISPOSITIVOS GRÁFICOS
@@ -209,20 +199,20 @@ plot(east$latitude, east$pm25, main = "East")
 * `plot`, `xyplot`, `qplot` son funciones que envían el grafico al dispositivo "pantalla"
 * los ficheros son tambien muy usados si queremos imprimir o hacer una presentación o guardar nuestro gráfico de forma independiente.
 
-Para ver qué dispositivos gráficos hay en nuestro sistema escribir `?Devices`.
+Para ver qué dispositivos gráficos hay en nuestro sistema escribimos `?Devices`.
 
 ## Cómo se crea un gráfico
 
-* llamando explicitamente al dispositivo
-
+Llamando explícitamente al dispositivo se crea.
+Una vez aierto se convierte en el dispositivo activo y sobreescribe en él.
+**__Para cerrar especificamente un dispositivo__** llamamos a `dev.off()`
 ```{r eval=FALSE}
-# pdf
+# Llamamos un pdf
 pdf(file = "myplot.pdf")
+    plot(x,y) # pintamos en el 
+dev.off()    # salimos del dispositivo
 ```
 
-* llamando a una funcion de dibujo
-* sobreescribiendo en un gráfico existente
-* **_para cerrar especificamente un dispositivo llamamos_** `dev.off()`
 
 ## Pintar en ficheros
 
@@ -854,6 +844,8 @@ qplot(carat,price,data=diamonds, color=cut) + geom_smooth(method="lm")
 #### Summary of qplot
 En resumen qplot, que es la funcion más simple de la librería ggplot2, es una forma simple de trazar gráficos, pero que da resultados esteticamente buenos y muchas opciones de trazado.
 
+ geom--	Specifies the geometric objects that define the graph type. The geom option is expressed as a character vector with one or more entries. geom values include "point", "smooth", "boxplot", "line", "histogram", "density", "bar", and "jitter"
+
 **HOJA RESUMEN DE GRAFICOS qplot:**
 
 ```{r}
@@ -1116,9 +1108,16 @@ Hay 5 lecciones para el curso 4.
     
 ## RECURSOS EXTERNOS
 
-[www.edwardtufte.com](www.edwardtufte.com)
-[R graph gallery](gallery.r-enthusiasts.com)
-[R Bloggers](http://www.r-bloggers.com/)
+### Graficos en R
+
+* [Muchos graficos con explicación](http://www.r-graph-gallery.com/portfolio/basics/)
+* [R graph gallery](gallery.r-enthusiasts.com)
+
+
+
+* [R Bloggers](http://www.r-bloggers.com/)
+* [www.edwardtufte.com](www.edwardtufte.com)
+
 
 ## REPASO DE APPLY
 2=COL 1=FILAS
