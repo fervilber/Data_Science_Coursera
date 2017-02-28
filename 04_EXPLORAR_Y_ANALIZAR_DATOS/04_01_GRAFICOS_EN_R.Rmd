@@ -1,5 +1,5 @@
 ---
-title: "01 GRÁFICOS EN R"
+title: "01 GRÁFICOS DE DATOS EN R"
 author: "Fernando Villalba"
 date: "25 de enero de 2017"
 output:
@@ -37,38 +37,41 @@ Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, dond
 
 Este curso se centra en el [analisis exploratorio de datos](<https://es.wikipedia.org/wiki/An%C3%A1lisis_exploratorio_de_datos).
 
-El análisis exploratorio de datos definido por John W. Tukey (E.D.A.: Exploratory data analysis) es, básicamente, el tratamiento estadístico al que se someten las muestras recogidas durante un proceso de investigación en cualquier campo científico. Para mayor rapidez y precisión, todo el proceso suele realizarse por medios informáticos, con aplicaciones específicas para el tratamiento estadístico. Los E.D.A., no necesariamente, se llevan a cabo con una base de datos al uso, ni con una hoja de cálculo convencional; no obstante el programa SPSS y R (lenguaje de programación) son las aplicaciones más utilizadas, aunque no las únicas.
+El análisis exploratorio de datos definido por John W. Tukey (E.D.A.: Exploratory data analysis) es, básicamente, el tratamiento estadístico al que se someten las muestras recogidas durante un proceso de investigación en cualquier campo científico. Para mayor rapidez y precisión, todo el proceso suele realizarse por medios informáticos, con aplicaciones específicas para el tratamiento estadístico. Los E.D.A., no necesariamente, se llevan a cabo con una base de datos al uso, ni con una hoja de cálculo convencional; no obstante el programa R es una de las aplicaciones más utilizadas.
 
-Cuando estamos tratando con datos, lo primero que hacemos para comprenderlos y empezar a familiarizarnos con su estructura es crear gráficas de exploración, sencillas, burdas, incluso sucias, que nos permiten ver rápidamente aspectos generales de los datos que tratamos de investigrar.
+Cuando estamos tratando con datos, lo primero que hacemos para comprenderlos y empezar a familiarizarnos con su estructura es crear gráficas de exploración, sencillas, burdas, incluso sucias, que nos permiten ver rápidamente aspectos generales y patrones de los datos que tratamos de investigrar.
 
 Quizás necesitamos hacer cientos de estos gráficos exploratorios incialmete hasta que empezamos a comprender y ver la estructura de los datos que nos permita comprender el problema de estudio.
 
 ## Principios del análisis gráfico 
 
-Existen unos  **Principios del análisis gráfico** sobre los que conbiene reflexionar y recordar en todo el proceso de trazado. Recordemos que se trata de un curso de ciencia de datos, por lo que: 
+Existen unos  **Principios del análisis gráfico** sobre los que conbiene reflexionar y recordar en todo el proceso de trazado. Estos son los principios aplicados a la ciencia de datos: 
 
 1. Siempre compara, busca una estado relativo sobre el que comparar los datos e hipótesis.
 2. Muestra la causalidad, el mecanismo, la explicación del sistema y su estructura.
 3. El mundo real es multivariable, no muestres solo una cara.
 4. Presenta datos de forma integrada, es decir con diferentes puntos de vista o representación.
-5. Documenta el proceso a analisis para que sea totalmente reproducible.
-6. Cuenta una historia, busca el contenido o fin de lo que presentas.
+5. Documenta el proceso de analisis para que sea totalmente reproducible.
+6. **Cuenta una historia, busca el contenido o fin de lo que presentas**.
 
-Al representar los datos en gráficas buscamos muchas cosas: comprenderlos, encontrar patrones, sugerir modelos de comprotamiento. Entonces ¿Por qué pintamos los datos en gráficas?, muy sencillo, hay un refrán español que dice: *más vale una imagen que 1000 palabras*.
+Al representar los datos en gráficas buscamos muchas cosas: comprenderlos, encontrar patrones, sugerir modelos de comprotamiento. Hay un refrán español que dice que: *más vale una imagen que 1000 palabras*, por eso pintamos los datos.
 
-Aunque existen muchas maneras de pintar datos con R, en estas lecciones vamos a centrarnos en 3 funciones, las caracteristicas del sistema base de R, la librería lattice y la librería ggplot.
+Aunque existen muchas maneras de graficar datos con R, en estas lecciones vamos a centrarnos en tres sistemas que son los más habituales en R:
+1. sistema R base.
+2. librería lattice
+3. librería **ggplot**.
 
-Cuando vamos a representar datos, tenemos tambien que pensar qué salida queremos para los gráficos:
+Además del sistema de representación y sus fucniones debemos prestar atención a la salida física de los gráficos:
 
-1. ¿Será en papel? o en una pantalla?
-2. ¿Se usará en una web?, para una presentación?
-3. ¿es muy grandeel número de datos a pintar?
-4. ¿Necesitaremos que cambie de tamaño de forma dinámica? o interactuar con él?
-5. ¿qué sistema usaremos para pintar?.... oleo, pastel, digital?
+ * ¿Será en papel? o en una pantalla?
+ * ¿Se usará en una web?, para una presentación?
+ * ¿es muy grande el número de datos a pintar?
+ * ¿Necesitaremos que cambie de tamaño de forma dinámica? o interactuar con él?
+ * ¿qué sistema usaremos para pintar?.... oleo, pastel, digital?
 
-El tipo de salida lo veremos en el apartado de dispositivos gráficos y puede ser importante si piensas usar los graficos no solo en la pantalla, sino para presentaciones o libros.
+El tipo de salida lo veremos en el apartado de [**dispositivos gráficos**](#dgraf) y puede ser importante si piensas usarlos no solo en la pantalla, sino para presentaciones o libros.
 
-En las lecciones del curso web se usa una tabla de datos extraida de la web de la agencia EPA de EEUU. Desde su web [EPA Air Quality System](https://www.epa.gov/aqs) podemos descargar los datos de ejemplo, que se corresponden con datos de calidad del aire en cada condado de  EEUU.
+En las lecciones del curso web se usa una tabla de datos extraída de la web de la agencia EPA de EEUU. Desde su web [EPA Air Quality System](https://www.epa.gov/aqs) podemos descargar los datos de ejemplo, que se corresponden con datos de calidad del aire en EEUU.
 ```{r eval=TRUE, echo=FALSE}
     setwd("C:/R/proyectos/Data_Science_Coursera/04_EXPLORAR_Y_ANALIZAR_DATOS/")
 ```
@@ -79,19 +82,21 @@ En las lecciones del curso web se usa una tabla de datos extraida de la web de l
         colClasses=c("numeric", "character","factor","numeric","numeric"))
     head(pollution, 3)
 ```
-Para estos apuntes hemos usado además, los datos de ejemplo incluidos en la librería `datasets`, en concreto la tabla 'cars`.
+Para estos apuntes hemos usado además, tablas de datos ejemplo incluidas en la librería `datasets`, en concreto las tabla `cars`y `faithful`.
 
 
 ## Gráficos simples de 1 variable <a name="g1d"></a>
 
-La forma más sencilla de ver los datos de una tabla es haciendo una gráfica rápida y sencilla de las variables importantes de la misma. Empezaremos con los gráficos más sencillos de una variable, para ello la forma más rápida es usar alguna de las siguientes funciones de R:
+El análisis exploratorio partimos de una tabla de datos (obtenida por ejemplo de la lectura de un fichero). Esta tabla  contiene las observaciones en cada linea y las variables por columna. Se definen los gráficos simples de una variable como aquellos que nos pintanlos datos de una columna de la tabla.
 
-1. *summary(data)* que devuelve el min, max, media, mediana y 2 cuantiles, no pinta pero siempre es bueno resumir.
-2. *boxplot(data, col="blue")* --> hace un gráfico simple con los datos de summary y una caja color azul en este caso que continene el 50% de los datos (entre el 25 y e 75%)
-3. *hist(data, col ="green", breaks=10 )*, hace la grafica del histograma de frecuencias en 10 partes. Se puede omitir breaks. Puedes añadir una marca de los datos con rug(pollution$pm25)
-4. *barplot(data, col=wheat)* hace gráfico de barras color trigo
+La forma más sencilla de ver los datos de una variables es haciendo una gráfica rápida y sencilla de la misma. Representar los datos nos da mucha información del rango, número, amplitud, forma etc.. de dicha variable. Para ello usaremos alguna de las siguientes funciones del Sistema Base de R:
 
-Veamos unos ejemplos de código, en los que dibujamos un boxplot o grafica de cajas que representa de forma sencilla una variable y un histograma de frecuencias de la misma
+1. *summary(data)* que devuelve el min, max, media, mediana y 2 cuantiles, no pinta, pero siempre es bueno este resumen.
+2. *boxplot(data, col="blue")* --> hace un gráfico simple con los datos de summary y una caja color azul -en este caso- que continene el 50% de los datos (entre el 25 y el 75%)
+3. *hist(data, col ="green", breaks=10 )*, hace la gráfica del histograma de frecuencias en 10 partes. Se puede omitir breaks. Puedes añadir una marca de los datos con `rug(pollution$pm25)`
+4. *barplot(data, col=wheat)* hace gráfico de barras color trigo(wheat).
+
+Veamos unos ejemplos de código, en los que dibujamos un boxplot o gráfica de cajas que representa de forma sencilla una variable y un histograma de frecuencias de la misma:
 ```{r eval=TRUE}
     library(datasets) # cargamos el paquete de datos de muestra
     head(cars,4);dim(cars) # vemos los primeros 4 elementos y las dimensiones de la tabla
@@ -102,7 +107,7 @@ Veamos unos ejemplos de código, en los que dibujamos un boxplot o grafica de caj
 # 1ª GRAFICA EXPLORATORIA: BOXPLOT 
     boxplot(cars$speed, col="lightgrey")
 # Si queremos añadir una linea al boxplot, por ejemplo para marcar el limite de 12
-    abline(h=7, lty=3, lwd=2)
+    abline(h=10, lty=3, lwd=2)
 # 2ª GRAFICA EXPLO. HISTOGRAMA DE UNA VARIABLE    
     hist(cars$speed, col="green")
     # La funcion rug() pinta una marca bajo cada punto de datos 
@@ -110,8 +115,12 @@ Veamos unos ejemplos de código, en los que dibujamos un boxplot o grafica de caj
     rug(cars$speed)
 ```
 
-Para pintar dos histogramas juntos podemos usar el atributo `add=TRUE`.
-Veamos un ejemplo en el que generamos 2 series aleatorias de 500 observaciones y medias 4 y 6. Usamos en los colores elcomando `alpha=0.5` para generar transparencia.
+
+## Gráficos más complejos <a name="g2d"></a>
+
+Si queremos ver mas de una variable, podemos repetir el proceso de pintado anterior para cada una de las variables o columnas de nuestros datos, por ejemplo pintamos dos histogramas en el mismo gráfico usando el atributo `add=TRUE`.
+
+Vamos a hacer un ejemplo en el que generamos 2 series aleatorias de 500 observaciones y medias 4 y 6. Usamos en los colores el atributo `alpha=0.5` para generar transparencia.
 
 ```{r eval=TRUE}
     set.seed(42) # iniciamos semilla aleatoria
@@ -120,12 +129,9 @@ Veamos un ejemplo en el que generamos 2 series aleatorias de 500 observaciones y
          main="Juntar dos histogramas", xlab="x" , ylab="frecuencia")
     # Pintamos segunda grafica encima
     hist(rnorm(500,6),add=T,col=scales::alpha('red',.5),border=F, xlab="x") 
-   
 ```
 
-## Gráficos más complejos <a name="g2d"></a>
-
-Para echar un ojo a varias variables al mismo tiempo y compararlas usaremos funciones como `boxplot` o `with`.
+Tambien podemos usar las funciones `boxplot` o `with`para pintar varias variables.
 Por ejemplo cuando comparamos dos variables x ~ y es muy útil la función `with(dataframe, plot(x,y,...))`
 donde la `x` e `y` se sustituyen por nombres de columnas en la dataframe.
 Una fórmula parecida usa la función `boxplot(x~y,data=dataframe, ...)`.
@@ -137,15 +143,15 @@ Una fórmula parecida usa la función `boxplot(x~y,data=dataframe, ...)`.
     boxplot(dist ~ speed ,data=cars, col=micolor, xlab="distancia",
         ylab="velocidad", main= "comparar distancia vs velocidad")
 ```
-## Múltiples gráficos
 
-Existe la opción de dividir el lienzo en varios apartados con las múltiples opciones de la función `par()`.
-que detallaremos más adelante, pero resaltamos `mfrow=c(num_filas,num,col)` pues es muy usada para crear multigraficas juntas. Duvide el lienzo en subgraficas según el numeor de filas y col marcados.
+## Gráficos multiples
+
+Llamamos gráficos multiples cuando dividimos el espacio de trabajo o lienzo en varios rectangulos y pintamos una gráfica en cada zona. Esta caracteristica se controla con la función `par()`que detallaremos más adelante, pero resaltamos el atributo `mfrow=c(num_filas,num,col)` que es muy útil para crear multigraficas.
 Veamos un ejemplo simple:
 
 ```{r eval=TRUE, warning=FALSE}
-# 
-# dividimos la ventana grafica en 2 filas 1 col
+# USO DE par() MULTIGRAFICAS 
+# dividimos la ventana grafica en 2 filas y 2 col
     par(mfrow=c(2,2), mar=c(4,4,2,1)) # 2 filas x 2 col, mar=c(bottom, left, top, right)
     hist(subset(pollution, region=="east")$pm25, col="lightgreen", main="Hist_1")
     hist(subset(pollution, region=="west")$pm25, col="lightblue", main="Hist_2")
@@ -163,11 +169,9 @@ Para hacerlos en R usamos dos funciones  `plot` y `with`
     el símbolo ~ se hace con la tecla AltGr + 4.
 2. `with(unatabla, plot(y, x))`
 
-Se trata de funciones poderosas, pues automáticamente nos sirve tambien para distinguir valores según un factor.
-Es decir que podemos pintar de distintos colores y agrupar datos según una de las variables, si es o transformamos esta variable en un fator. 
-
+Se trata de funciones poderosas, pues nos dan acceso tambien a opciones de agrupamiento automático, si seleccionamos un factor como variable en algún atributo de color.Es decir, podemos pintar de distintos colores = agrupar datos según una de las variables si tomamos dicha variable como factor y lo añadimos como atributo en color `(col= variable_factor)`. 
 ```{r eval=TRUE}
-# creamos una multigrafica de 1x2 
+# creamos una multigrafica de 1fila x 2col 
     par(mfrow=c(1,2))
 # pintamos los datos x~y
     with(pollution,plot(latitude,pm25,col=micolor, pch=20))
@@ -183,65 +187,57 @@ Es decir que podemos pintar de distintos colores y agrupar datos según una de la
     dev.off()
 ```
 
-# DISPOSITIVOS GRÁFICOS
+# DISPOSITIVOS GRÁFICOS <a name="dgraf"></a>
 
 ## ¿Qué es un dispositivo gráfico?
 
-* Un dispositivo gráfico es el objeto en el que pintamos, el `lienzo` sobre el que trazamos las gráficas, por ejemplo:
+Un dispositivo gráfico es el objeto en el que pintamos, el `lienzo` sobre el que trazamos las gráficas, por ejemplo:
     * una ventana en el PC, es un dispositivo gráfico de pantalla (screen device)
     * un fichero PDF 
     * un fichero PNG, JPEG 
     * un fichero SVG (scalable vector graphic)
-* Cuando generamos un gráfico, tiene que ser enviado a un dispositivo que haga de lienzo.
-* Para abrir un dispositivo usamos los comandos:
-    * `quatz()` en Mac, `X11()` en Linux, `windows()` en Windows
-    * `?Device` par encontrar todos los dispositivos
-* `plot`, `xyplot`, `qplot` son funciones que envían el grafico al dispositivo "pantalla"
-* los ficheros son tambien muy usados si queremos imprimir o hacer una presentación o guardar nuestro gráfico de forma independiente.
+    
+Cuando generamos un gráfico en R, tiene que ser enviado a un dispositivo que haga de lienzo.
+Para abrir un dispositivo usamos los comandos: `quatz()` en Mac, `X11()` en Linux, `windows()` en Windows.
+Para ver qué dispositivos gráficos hay en nuestro sistema escribimos `?Devices` en la linea de comandos.
 
-Para ver qué dispositivos gráficos hay en nuestro sistema escribimos `?Devices`.
+* `plot`, `xyplot`, `qplot` son funciones que envían por defecto el grafico al dispositivo "pantalla". Aunque podemos especificar otra salida diferente como por ejemplo un fichero que nos permita almacenar la imagen de nuestro gráfico de forma independiente.
 
-## Cómo se crea un gráfico
+
+## Como se crea un gráfico
 
 Llamando explícitamente al dispositivo se crea.
-Una vez aierto se convierte en el dispositivo activo y sobreescribe en él.
-**__Para cerrar especificamente un dispositivo__** llamamos a `dev.off()`
+Una vez aierto se convierte en el dispositivo activo y sobreescribe en él todas las llamadas a pintar.
+Para cerrar especificamente un dispositivo llamamos a la función `dev.off()`
 ```{r eval=FALSE}
-# Llamamos un pdf
+# Llamamos y creamos un fichero pdf como dispositivo gráfico.
 pdf(file = "myplot.pdf")
     plot(x,y) # pintamos en el 
-dev.off()    # salimos del dispositivo
+dev.off()     # salimos del dispositivo
 ```
 
+## Salida en fichero
+Podemos seleccionar muchos tipos de dispositivos de salida de fichero, cada uno con sus ventajas e inconvenientes.
+A grandes rasgos, existen los ficheros vectoriales y los raster.
 
-## Pintar en ficheros
-
-### Vectoriales
-
-* Pros: bueno para graficos lineales, cambiar tamaño sin perder calidad sin distorsión.
-* Contras: no son buenos cuando hay gran cantidad de puntos/datos que pintar.
-
-Los dispositivos usuales de este tipo son: pdf, svg, windows metafile o 
-postscript.
-
-### Raster
-
-* Pros: good for plot with lots of points
-* Contras: doesn't resize well
-
-Formatos de este tipo habituales son: png, jpeg, tiff o bmp.
+1. Vectoriales (pdf, svg, windows metafile o postscript)
+    * Pros: bueno para graficos lineales, cambiar tamaño sin perder calidad sin distorsión.
+    * Contras: no son buenos cuando hay gran cantidad de puntos/datos que pintar.
+2. Raster (png, jpeg, tiff o bmp.)
+    * Pros: good for plot with lots of points
+    * Contras: doesn't resize well
 
 ## Múltiples dispositivos gráficos
 
-Podemos abrir muchos dispositivos, pero solo podemos pintar desde R en uno cada vez. Cada dispositivo tiene un número entero como identificativo.
+Podemos abrir muchos dispositivos, pero solo podemos pintar desde R en uno cada vez. Cada dispositivo tiene un número entero como identificador.
 
 * `dev.cur()` --> nos da el numero del dispositivo actual, siempre mayor o igual a 2
-* `dev.set(integer)`--> establece el dispositivo indicado en integer como actual.
+* `dev.set(integer)`--> establece el dispositivo indicado en `integer` como actual.
 
 ## Copiar gráficas entre dispositivos
-Lo usamos cuando nos gusta por ejemplo la que hemos hecho en pantalla y la queremos guardar en fichero:
+Se pueden copiar los graficos desde un dispositivo a otro diferente, por ejemplo cuando queremos grabar el grafico en pantalla en un fichero:
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 library(datasets)
 with(faithful,plot(eruptions,waiting)) # Crea un dibujo
 title(main="Datos de daños Geyser") # sobreescribimos el título
@@ -249,236 +245,155 @@ dev.cur() # nos muestra cual es el grafic device por defecto ahora
 dev.copy(png, file = "myfile.png") # copia el dibujo a un fichero png
 dev.off() # cierra el dispositivo png.
 ```
-Para copiar en pdf existe una funcion especifica `dev.copy2pdf`
+---
+Para copiar en un fichero pdf existe una funcion especifica `dev.copy2pdf`
+Ojo, pues los gráficos en fichero no tienen por qué mostrarse igual que en pantalla.
 
-**Advertencia: los gráficos no tienen por qué mostrarse igual que en pantalla.**
-
-### Ejemplos
-
-```{r eval=FALSE}
-# pdf
-pdf(file = "myplot.pdf") # abrimos el dispositivo gráfico
-#creamos un grafico y lo mandamos al dispositivo pdf
-with(faithful,plot(eruptions,waiting))
-title(main="Datos de daños Geyser") # sobreescribimos el título
-dev.off()# cerramos el dispositivo, para volver a dejar la pantalla por defecto
-```
-
-# LOS PRINCIPALES 3 SISTEMAS DE TRAZADO GRÁFICO EN R
-
-En estas lecciones vamos a usar los 3 sistemas principales de generar gráficos en R, a los que dedicaremos un apartado de desarrollo específico. No son los únicos, hay cientos de librerías para generar gráficas, pero estas son las más usadas:
+# LOS PRINCIPALES SISTEMAS DE TRAZADO GRÁFICO EN R
+Existen cientos de maneras diferentes de crear una representación gráfica con R, tantas como paquetes de gráficos existen con dicho fin, pero hay 3 que han destacado por su sencillez, robuztez y uso generalizado son:
 
 1. **base plot system** o sistema base 
-    Es el sistema de pintado por defecto incluido en el nucleo de R. La idea es la misma que la de un artista ante un lienzo blanco.
-    Se van añadiendo cosas una a una al lienzo con funciones diferenciadas: lineas, etiquetas, puntos, gráficas...
-    Es una manera muy completa de crear, pero tiene el inconveniente de que si no quieres los valores por defecto tendrás que saber como hacer cada cosa específica.
+    Es el sistema de pintado por defecto incluído en el núcleo de R. La idea básica es la misma que se tiene al pintar un lienzo de artista sobre el que se van añadiendo cosas una a una, creando capas de pintura o efectos. Existen muchas funciones diferenciadas y epecificas para cada labor: lineas, etiquetas, puntos, gráficas...
+    Es una manera muy completa de crear, pero tiene el inconveniente de que, si no quieres los valores por defecto tendrás que saber cómo hacer cada cosa específica.
 2. **Lattice plot system**
-    Los gráficos se crean de una vez llaman.
-    Bueno para muchas gráficas juntas en una página o pantalla
+    Los gráficos se crean de una vez. es bueno para muchas gráficas juntas en una página o pantalla.
 3. **ggplot system**
-    Es una mezcla de los anteriores con unas opciones por defecto interesantes y capacidad para personalizar todo
+    Es una mezcla de los anteriores con unas opciones por defecto interesantes y capacidad para personalizar todo.
 
 
 ## Base Plotting system (sistema base) <a name="BS"></a>
 
-Es el SISTEMA ELEMENTAL PARA PINTAR GRÁFICOS CON R
+Es el sistema elemental para pintar gráficos con R.
+Los comandos básicos son: `plot, hist, boxplot, barplot`=(pintar_genérico, histograma, grafico de cajas, grafico de barras).
 
-Los comandos básicos son: `plot, hist, boxplot`.
+Cada llamada a estas funciones lanza un objeto gráfico si no hay ya uno abierto.
+Existen muchas opciones de personalización,cada una con una funcion que añade una nueva capa al dibujo, pero es interesante saber que gran parte de la personalización del lienzo se consigue a través de la función `par()`.
 
-*plot* y *hist* lanzarán un objeto gráfico, si no hay ya uno abierto.
-plot tienen muchas opciones de personalización, titulos ejes..gran parte de estas opciones se montan con el comando `par` .
+El sistema base está incluido en las librerías del núcleo de R `graphics` y `grDevices`. La primera contiene los comandos `plot`, `hist` etc. y la segunda todos los comandos relacionados con los dispositivos gráficos de impresión, ya sea la pantalla, un fichero o un pdf.
 
-El sistema base está incluido en las librerías del núcleo de R `graphics` y `grDevices`. La primera contiene los comandos plot, hist etc.. y la segunda todos los comandos relacionados con los dispositivos gráficos de impresión, ya sea la pantalla, un fichero, un pdf etc...
-Una de las desventajas del base system es que no se puede ir hacia atrás una vez lanzado un comando.
+Una de las **desventajas** del _sistema base_ es que no se puede "ir hacia atrás"" una vez lanzado un comando.
 
 
 ### Parámetros globales de 'plot' (par):
-Usa `par()` para especificar estos parametros, tambien para ver el valor de estos parámetros actualmente `par("col")`.
+Se usa `par()` para especificar estos parametros globales, tambien para ver el valor de estos parámetros actualmente `par("col")`. entre los muchos atributos que se especifican con `par` están:
 
 * `pch`: simbolo del dato (circulos por defecto. ver `points` para más detalles)
 * `lty`: tipo de linea
 * `lwd`: ancho de linea
-* `col`: color, puede ser un numero, o el nombre, hex , `colors()` function gives a vector of color by name
+* `col`: color, puede ser un número, o el nombre, hex o una función: `colors(4)`
 * `xlab`: etiqueta eje x 
 * `ylab`: etiqueta eje y
-* `las`: the orientation of axis labels on the plot
-* `bg`: background color
-* `mar`: margenes. (abajo, izq, der, arriba). The unit is line of
-text.
-* `oma`: the outer margin size
-* `mfrow`: number of plots per row and per column, filled row-wise.
-* `mfcol`: number of plots per column and per row, filled column-wise.
+* `las`: orientación de las etiquetas del eje
+* `bg`: background, color de fondo
+* `mar`: margenes. (abajo, izq, dech, arriba).
+* `oma`: tamaño de fuera de margen
+* `mfrow`: divide el lienzo por el número de filas y columnas especificado. Se pinta por orden de filas.
+* `mfcol`: divide el lienzo por el número de filas y columnas especificado. Se pinta por orden de Columnas.
 
 ![tipos de punto](imag/points.png)
 
 ![tipos de linea \label{lineas}](imag/lines.png)
 
-### Funciones de Base plotting
+### Funciones del Sistema Base 
 
-* `plot`: crea un gráfico dependiendo de los datos hace uno u otro tipo.
+* `plot`: crea un gráfico. Según los datos hace uno u otro tipo.
 * `lines`: añade una linea a una gráfica.
 * `points`: añade puntos a una gráfica.
-* `with`: crea un gráfico de dispersión. with(tabla, plot(colA,ColB))
-* `text`: añade texto de etiquetas.
+* `with`: crea un gráfico de dispersión. `with(tabla, plot(colA,ColB))`
+* `text`: añade texto de etiquetas:`text(coorX,CoorY,"texto que se pone")`
 * `title`: añade el título.
-* `mtext`: m means margin, add text to margins.
-* `axis`: add axis ticks and labels.
-* `legend`: add legend. If they are the line, specify `lty`. If they are
-character, specify `pch`.
+* `mtext`: m means margin, añade texto en el margen.
+* `axis`: añade las marcas y etiqueta de los ejes.
+* `legend`: añade legenda.
 
-### Ejemplos con sistema base 
+### Ejemplos con el Sistema Base 
 
-Podemos usar la función `examples` para ver muchos ejemplos gráficos:
-`examples(points)`
-
-```{r}
+Podemos usar la función `example` para ver muchos ejemplos gráficos:
+`example(points)`
+```{r eval=TRUE}
 library(datasets)
-#usaremos en este ejemplo la data airquality que contiene medidas de ozono en NY en dias de 1973
-#pinto un histograma
-head(airquality)
-# vemos el rango (min-max) de la var ozono sin contar los NA
-range(airquality$Ozone,na.rm=TRUE)
+# Usaremos en este ejemplo la data airquality que contiene medidas de ozono en NY en dias de 1973
+# ver primeras lineas tabla de datos
+    head(airquality,4)
+# ver rango (min-max) de la variable ozono sin contar los NA
+    range(airquality$Ozone,na.rm=TRUE)
 
-hist(airquality$Ozone) # pinta un gráfico de histograma de la variable ozono de la tabla airquality
+# pinta un gráfico de histograma de la variable ozono de la tabla airquality
+    hist(airquality$Ozone) 
 #vams a ver cuantas medidas hay cada mes:
-table(airquality$Month)
+    table(airquality$Month)# comando table =summarize o aggregate
 # hacemos un grafica de cajas para cada mes
-boxplot(Ozone~Month,airquality)
+    boxplot(Ozone~Month,airquality)
 #hacemos lo mismo pero añadiendo etiquetas y colores
-boxplot(Ozone~Month,airquality, xlab="Month", ylab="Ozone (ppb)",col.axis="blue",col.lab="red")
+    boxplot(Ozone~Month,airquality, xlab="Month", ylab="Ozone (ppb)",col.axis="blue",col.lab="red")
 #añadimos un titulo:
-title(main="Ozone and Wind in New York City")
-
+    title(main="Ozone and Wind in New York City")
 # Ahora pintamos un scatterplot grafico de dispersión
-plot(airquality$Wind, type="n",airquality$Ozone) # type="n" dice que no pinte los datos en el grafico aún
-title(main="Wind and Ozone in NYC")
+    plot(airquality$Wind, type="n",airquality$Ozone) # type="n" dice que no pinte los datos en el grafico aún
+    title(main="Wind and Ozone in NYC")
 # creamos subconjunto de los valores de mayo
-may <- subset(airquality, Month==5)
+    may <- subset(airquality, Month==5)
 #pintamos ese conjunto
-points(may$Wind,may$Ozone,col="blue",pch=17)
+    points(may$Wind,may$Ozone,col="blue",pch=17)
 # ahora los meses que no son mayo
-notmay <- subset(airquality, Month!=5)
-points(notmay$Wind,notmay$Ozone,col="red",pch=8)
+    notmay <- subset(airquality, Month!=5)
+    points(notmay$Wind,notmay$Ozone,col="red",pch=8)
 
 #añadimos la legenda
-legend("topright",pch=c(17,8),col=c("blue","red"),legend=c("May","Other Months"))
+    legend("topright",pch=c(17,8),col=c("blue","red"),legend=c("May","Other Months"))
 #añadimos una linea vertical:
-abline(v=median(airquality$Wind),lty=2, lwd=2)
+    abline(v=median(airquality$Wind),lty=2, lwd=2)
 
+    # dos graficos juntos
+    par(mfrow=c(1,2))
+    plot(airquality$Wind,airquality$Ozone,main="Ozone and Wind")
+    plot(airquality$Ozone,airquality$Solar.R,main="Ozone and Solar Radiation")
 
-par(mfrow=c(1,2))
-plot(airquality$Wind,airquality$Ozone,main="Ozone and Wind")
-plot(airquality$Ozone,airquality$Solar.R,main="Ozone and Solar Radiation")
+    #ahora un grafico de 3 graficas
+    par(mfrow = c(1, 3),mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
+    plot(airquality$Wind,airquality$Ozone,main="Ozone and Wind")
+    plot(airquality$Solar.R,airquality$Ozone,main="Ozone and Solar Radiation")
+    plot(airquality$Temp,airquality$Ozone,main="Ozone and Temperature")
+    mtext("Ozone and Weather in New York City",outer=TRUE)
 
-#ahora un grafico de 3 graficas
-par(mfrow = c(1, 3),mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
-plot(airquality$Wind,airquality$Ozone,main="Ozone and Wind")
-plot(airquality$Solar.R,airquality$Ozone,main="Ozone and Solar Radiation")
-plot(airquality$Temp,airquality$Ozone,main="Ozone and Temperature")
-mtext("Ozone and Weather in New York City",outer=TRUE)
 # with(tabla, plot(col,colB))
-with(airquality, plot(Wind,Ozone, main="Ozono y viento en NY",pch=20))
+    with(airquality, plot(Wind,Ozone, main="Ozono y viento en NY",pch=20))
 # Añado que pinte los del mes de mayo en azul
-with(subset(airquality, Month==5), points(Wind,Ozone,col="blue"))
-# Añadimosuna leyenda
-legend("topright", pch =1, col=c("blue","black"),legend=c("Mayo","otros"))
-#añadimos linea de regresion
-model<-lm(Ozone ~ Wind,airquality)
-abline(model,lwd=2)
+    with(subset(airquality, Month==5), points(Wind,Ozone,col="blue"))
+# Añadimos una leyenda
+    legend("topright", pch =1, col=c("blue","black"),legend=c("Mayo","otros"))
+    #añadimos linea de regresion
+    model<-lm(Ozone ~ Wind,airquality)
+    abline(model,lwd=2)
 
 # Grafica de cajas boxplot
-airquality<-transform(airquality,Month=factor(Month))
-boxplot(Ozone ~ Month, airquality, xlab="mes", ylab="ozono ppb")
+    airquality<-transform(airquality,Month=factor(Month))
+    boxplot(Ozone ~ Month, airquality, xlab="mes", ylab="ozono ppb")
 
 #EJEMPLO GRAFICOS MULTIPLES
 par(mfrow=c(1,2))# (filas, col)
-with(airquality, {
+with(airquality,{
     plot(Wind, Ozone, main="Ozono vs viento")
     model<-lm(Ozone ~ Wind,airquality) #
     abline(model,lwd=2) #
     plot(Solar.R, Ozone, main=" Ozono y radiacion solar")
 })
 
-#las opciones de personalizacion son inmensas..
+```
+Las opciones de personalizacion de par() son inmensas (72 para ser exactos), para ver todas podemos hacer la llamada siguiente:
+```{r}
 length(par())
 names(par()) # esto nos da los nombres de las opciones
-#para ver las opciones que tenemos ahora
+
+# para ver qué valores hay actualmente de cada atributo hacemos:
 par()$pin #Plot dimensions in inches
-# o par("pin") or par('pin'))
+par("pin") 
 par("lty") #default line type is solid
-
-# para cambiar a un nuevo grafico o los valores por defecto usaremos:
-plot.new # o dev.off
-
-```
-#### Ejemplos 2
-
-```{r}
-library(datasets)
-head(cars)
-#pintamos de la datatable cars, dos variables
-with(cars, plot(speed,dist))
-# Añadimos un texto al grafico
-# lo situamos en la mitad (media), parte alta 
-text(mean(cars$speed),max(cars$dist),"aquí va")
 ```
 
-#### Ejemplos Ejercicio 2 curso
 
-El ejercicio 1 del curso porpone bajar un fichero de unos 120 mb de datos de consumo de electricidad de unca casa.
-Nos pide hacer una serie de gráficas de los datos en 2 días concretos el 1 y 2 de febrero e 2007.
-La base de datos del fichero consta de 9 variables, fecha, hora, medidor , voltage, etc...
-Lo que interesa es que se pueden leer directamente las lineas que deseamos así:
-```{r}
-# household_power_consumption.txt
-# nrow corresponding 2007/02/01 to 2007/2/02 --> 66637 to 69517
-nombres <- c("Date", "Time", "Global_active_power", "Global_reactive_power", "Voltage", "Global_intensity", "Sub_metering_1", "Sub_metering_2", "Sub_metering_3")
-data <- read.table("household_power_consumption.txt", skip = 66637, nrows = 69517 - 66637, sep = ";", na.strings = "?",col.names=nombres )
-
-# summary data
-dim (data)
-str(data)
-summary(data)
-
-```
-y pintar las graficas con este código: solo codigo base.
-
-Fechas
-```{r}
-# create a new var class POSIXlt, col 10
-data$DateTime <- strptime(paste(data$Date, data$Time, sep=" "), "%d/%m/%Y %H:%M:%S")
-```
-** plot 1**
-
-we first plot on screen and then in a png file
-```{r}
-# plot in screem 
-hist(data$Global_active_power, xlab="Global Active Power (kilowatts)", main="Global Active Power", col="wheat")
-
-# plot in png
-png('plot1.png',width = 480, height = 480, units = "px")
-hist(data$Global_active_power, xlab="Global Active Power (kilowatts)", main="Global Active Power", col="red")
-dev.off()
-
-```
-** Result
-
-![plot1](imag/plot1.png) 
-
-** plot 2** 
-
-```{r}
-# plot 2
-plot(data$DateTime, data$Global_active_power, ylab="Global Active Power (kilowatts)", xlab="", type="n")
-lines(data$DateTime, data$Global_active_power, type= "l")
-# copy from screen to png
-dev.copy(png,"plot2.png")
-dev.off()
-```
-
-![plot2](imag/plot2.png) 
-
-** Plot 3** 
+#### Escala tempral de x
+Cuando la variable x es una fecha, el gráfico ajusta la escala x como temporal automáticamente:
 
 ```{r}
 # plot 3
@@ -492,6 +407,9 @@ legend("topright",legend=c("sub-metering_1","sub-metering_2","sub-metering_3"),c
 dev.off()
 ```
 ![plot3](imag/plot3.png) 
+
+Cuando queremos añadir varia gráficas sobre el mismo grafico y escala, usamos el atributo type="n" en la primera, para definir la escala pero no pintar la grafica, y añadimos una a una el resto de graficas al lienzo.
+En el siguiente ejemplo se pinta de este modo una gráfica compuesta en un fichero png
 
 ** Plot 4** 
 ```{r}
@@ -518,61 +436,78 @@ dev.off()
 ```
 ![plot4](imag/plot4.png) 
 
-### Colores
-Vamos a ver como usar colores en las gráficas. Existen muchas formas de especificarlos:
-Por ejemplo un vector así: col=c(1:3), nos dá los 3 colores primarios.
+### Uso de colores
+Existen muchas maneras de especificar el color de los distintos elementos de una gráfica.
+Por ejemplo, un vector así: col=c(1:3), nos dá los 3 colores primarios.
 
-Existen conjuntos predefinidos de colores o paletas, podemos ver los nombres con el comando:
-sample(colors(),10) , bueno los 10 primeros pues hay 657 (heat.colors,topo.colors....),pero tambien podemos crear una paleta personalizada con los comandos `colorRamp` y `colorRampPalette` :
+Existen 657 colores predefinidos en R, con nombre propio. Estos colores se almacenan en el vector `colors`. Si queremos generar una paleta de 10 colores podemos usar el comando `sample(colors(),10)` que nos da los nombres de 10 colores aleatorios de `colors`. Estos colores se pueden especificar directamente por su nombre como "red", "chocolate1" o "coral".
 
-Veamos unos ejemplos
+Tambien existen paletas predefinidas con nombre que se almacenan en `RColorBrewer`como veremos más adelante, y podemos acceder a las mismas por su nombre ("heat.colors","topo.colors"....).
 
-```{r}
-#crea una paleta personalizada
-pal<-colorRamp(c("red","blue"))
+Si queremos personalizar los colores, R nos permite crear una paleta a gusto del usuario con los comandos `colorRamp` y `colorRampPalette` :
 
-pal(0) # color 0 de la paleta red
-pal(0.5) # mitad red mitad blue
-pal(seq(0,1,len=6))# crea 6 colores con la paleta hecha antes
+#### Crear paleta de colores personalizada
+`colorRamp` es una funcion que genera un color RGB a partir de colores discretos.
+El valor del color se toma de forma continua entre 0 y 1 y devuelve un color RGB.
 
-#ahora lo mismo pero usando colorRamPalette
-p1<-colorRampPalette(c("red","blue"))
-p1(2) # retorna 2 colores con la paleta red blue
-p1(6) # retorna 6 colores
-
-p2<-colorRampPalette(c("red","yellow"))
-
-# para ver las escalas usaremos esta funcion:
+Veamos un ejemplo: Antes tambien definimos una función que nos será util para representar los colores de una paleta continua:
+```{r eval=TRUE, echo=TRUE}
+# Funcion para ver las escalas de color:
+# esta funcion pinta una grafica con los colores de la escala.
 verEscalas<-function(cv){
   myarg <- deparse(substitute(cv))
   z<- outer( 1:20,1:20, "+")
   obj<- list( x=1:20,y=1:20,z=z )
   image(obj, col=cv, main=myarg  )
 }
-verEscalas(p2(20))
 
-#añadimos la transparencia con alpha
-p3<-colorRampPalette(c("blue","green"),alpha=0.5)
-plot(x,y,pch=19,col=rgb(0,.5,.5,0.3)) #alfa=0,3
+# crea una paleta personalizada con colorRamp
+    pal<-colorRamp(c("red","blue"))
+# Usa la paleta anterior
+    pal(0) # color 0 de la paleta red
+    pal(0.5) # mitad red mitad blue
+    pal(seq(0,1,len=6))# crea 6 colores con la paleta hecha antes
+    verEscalas(pal(seq(0,1,len=6)))
+```
+`colorRamPalette` es una funcion que devuelve un color hexadecimal a partir de colores discretos.
+A diferencia de `colorRamp` que siempre da un único valor de color a partir de un argumento que siempre es un valor entre 0 y 1, `colorRamPalette`necesita de argumento el número de colores que queremos generar en la paleta.
+Es algo más intuitiva, pues definimos los colores base, y despues al llamarla generamos una paleta de x colores directamente.
 
+Una de las ventajas de usar paletas personlizadas es que podemos definir tambien la transparencia de los colores mediante el argumento alpha, como veremos en el segundo ejemplo:
+
+```{r eval=TRUE, echo=TRUE}
+# Paleta usando colorRamPalette
+    pal1<-colorRampPalette(c("red","blue", "green"))
+    pal1(2) # retorna 2 colores con la paleta red blue green
+    pal1(6) # retorna 6 colores
+    verEscalas(pal1(20)) # vemos la escala
+    
+# TRANSPARENCIA DE LA PALETA CON alpha
+    pal3<-colorRampPalette(c("blue","green", "yellow"),alpha=0.5)
+    verEscalas(pal3(20))
 ```
 
-La funcion rgb() es la base de los colores:
+#### RGB
+La funcion rgb() es la base para la formación de colores, su uso es muy simple:
 
  `rgb(red, green, blue, alpha, names = NULL, maxColorValue = 1)`
 
-Hay otro conjunto de paletas predefinidas que podemos usar desde colorBrewer.
-Esta libreria **RColorBrewer** tiene muchas paletas y si queremos usar la llamada paleta BuGn haremos esto:
+### RColorBrewer paletas predefinidas
+Como vimos la funcion `colors()` almacena colores básicos con nombre propio, y `colorBrewer` almacena paletas predefinidas, pero ojo se trata de un **paquete** opcional, que hay que instalar.
+Una vez instalado se hace una llamada a `brewer.pal(num_colores,"nombre_paleta"), depues usamos `colorRampPalette` tal y como lo vimos en apartados anteriores:
 
-```{r}
-#genera una paleta de 3 colores basados en la paleta  "BuGn"
-cols<-brewer.pal(3,"BuGn")
-pal<-colorRampPalette(cols)
-pal(20)
-verEscalas(pal(20))
-# volcano is a matrix included in the package datasets
-image(volcano, col=pal(20))
-image(volcano, col=p1(20))
+```{r eval=TRUE, echo=TRUE}
+library("RColorBrewer") # cargamos librería
+# Genera una paleta de 3 colores basados en la paleta  "BuGn"
+    cols<-brewer.pal(3,"BuGn")
+    # generamos paleta con estos colores
+    pal<-colorRampPalette(cols)
+    pal(20) # generamos 20 colores basados en la paleta
+
+    # verEscalas(pal(20))
+    # Vemos el uso de esta paleta con los datos de volcano
+    # que contienen altura de un volcal de ejemplo package datasets
+    image(volcano, col=pal(20))
 ```
 
 

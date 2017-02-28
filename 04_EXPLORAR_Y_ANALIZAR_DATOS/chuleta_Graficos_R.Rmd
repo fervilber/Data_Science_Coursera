@@ -30,7 +30,10 @@ Ahora lo mismo para una dataframe que generamos con variables aleatorias:
 x<-1:100
 y<-rnorm(100)
 df<-data.frame(x,y)
+
+
 ```
+
 ## SELECCIONAR SUBCONJUNTOS DE LOS DATOS
 
 Lo más sencillo es usar el comamdo subset de R base.
@@ -71,6 +74,25 @@ abline(v= median(x), col= "magenta", lwd=4)
 
 barplot(table(pollution$region), col="wheat", main="numero de condados por region")
 ```
+
+ 
+```{r}
+#Generamos datos aleatorios
+x<-rnorm(100)
+ # añadimos cortes.
+hist(x, col="green", breaks=5)
+rug(x)
+
+ #añadimos linea vertical
+abline(v= 1, lwd=2) # grosor 2)
+ #añadimos linea vertical en la media
+abline(v= median(x), col= "magenta", lwd=4) 
+ # lwd=line_width=grosor 2)
+ # lty=tipo linea
+
+#barplot(table(pollution$region), col="wheat", main="numero de condados por region")
+```
+
 
 
 ```{r histograma1}
