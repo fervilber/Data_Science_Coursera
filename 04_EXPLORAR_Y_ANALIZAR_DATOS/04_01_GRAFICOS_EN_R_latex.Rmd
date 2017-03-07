@@ -31,20 +31,23 @@ output:
 \begin{titlepage}
     \begin{center}
         \begin{LARGE}
-            \textsc{APUNTES DE R \\
+            \textsc{MANUAL DE R \\
             }
-            \textsc{--- \\
-            CIENCIA DE DATOS}
+            \textsc{
+            APLICADO A LA CIENCIA DE DATOS \\ }
+            \textsc{ --- \\
+            CAPITULO 4 GRÁFICAS CON R }
         \end{LARGE}
         \textsc{ \\}
         \textsc{ \\}
-        \includegraphics[width=0.8\linewidth]{logo1.jpg}
+        \includegraphics[width=0.8\linewidth]{portada.png}
     \end{center}
     \begin{large}
-        \textit{-apuntes de R en Castellano-}
+        \textit{ Manual de R en Castellano}
     \end{large}
     \begin{flushright}
         \textit{Fernando Villalba Bergado \\
+        fervilber@gmail.com \\
         enero 2017 \\
         }
     \end{flushright}
@@ -78,7 +81,7 @@ knitr::opts_chunk$set(eval=FALSE,
   a4alto<- 11.7
 ```
 
-# INTRODUCCIÓN A LOS GRÁFICOS DE EXPLORACION DE DATOS CON R <a name="l1"></a>
+# INTRODUCCIÓN A LOS GRÁFICOS CON R <a name="l1"></a>
 
 Lección del curso cuarto de la especialización en DATA SCIENCE.
 Los apuntes corresponden a la semana 1 del curso Exploratory Data Analysis, donde se explica el uso de gráficos en R.
@@ -488,7 +491,7 @@ Con la función `plot` podemos especificar el tipo de gráfico a pintar con el arg
 * "l" lineas solas,
 * "b" lineas y puntos,
 * "c" solo lineas aparte,
-* "o" para el tipo 'overplotted',
+* "o" para el tipo 'overplotted' similar al tipo "b"
 * "h" para pintar un 'histograma',
 * "s" pasos de escalera,
 * "n" no pinta, pero ajusta la escala.
@@ -501,6 +504,14 @@ Para especificar los títulos se usan los argumentos:
 * `xlab` descripción eje x
 * `ylab` descripción eje y
 
+```{r eval=TRUE, fig.cap="tipos de gráficas con plot",fig.width=0.8*a4ancho,fig.height=0.3*a4alto}
+y<-rnorm(30)
+par(mfrow=c(4,2),mar=c(3,3,2,2))
+plot(y,type="p", main="tipo 'p'")
+plot(y,type="l", main="tipo 'l'")
+plot(y,type="b", main="tipo 'b'")
+plot(y,type="h", main="tipo 'h'")
+```
 
 ### Ejemplos con el Sistema Base 
 

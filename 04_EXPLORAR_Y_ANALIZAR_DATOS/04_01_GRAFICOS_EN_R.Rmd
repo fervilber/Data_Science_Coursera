@@ -4,10 +4,11 @@ author: "Fernando Villalba"
 date: "25 de enero de 2017"
 output:
   pdf_document:
+    fig_caption: yes
     fig_crop: no
-    fig_height: 3
-    fig_width: 5.5
     highlight: tango
+    keep_tex: yes
+    number_sections: yes
     toc: yes
     toc_depth: 4
   html_document:
@@ -16,19 +17,19 @@ output:
     toc_depth: 2
 ---
 
-```{r setup,echo=FALSE}
-knitr::opts_chunk$set(eval=FALSE,echo=TRUE,warning = FALSE,error = FALSE,message = FALSE)
-knitr::opts_chunk$set(fig.align='center')
-
+```{r setup,include=FALSE}
+#fig.pos="htbp"
+knitr::opts_chunk$set(eval=FALSE,
+                 echo=TRUE,
+                 warning = FALSE,
+                 error = FALSE,
+                 message = FALSE,cache=FALSE,
+                 fig.align='center',
+                 fig.pos='h'
+                )
+  a4ancho<- 8.3
+  a4alto<- 11.7
 ```
-## INDICE
-1. [Leccion 1](#l1)
-2. [Graficos 1D](#g1d)
-3. [Graficos 1D](#g2d)
-4. [Scatterplot](#st)
-5. [Leccion 2](#l2)
-6. [Plot](#BS)
-
 
 # INTRODUCCIÓN A LOS GRÁFICOS DE EXPLORACION DE DATOS CON R <a name="l1"></a>
 
@@ -97,7 +98,7 @@ La forma más sencilla de ver los datos de una variables es haciendo una gráfica 
 4. *barplot(data, col=wheat)* hace gráfico de barras color trigo(wheat).
 
 Veamos unos ejemplos de código, en los que dibujamos un boxplot o gráfica de cajas que representa de forma sencilla una variable y un histograma de frecuencias de la misma:
-```{r eval=TRUE}
+```{r eval=TRUE, fig.cap='gráficas de una variable',fig.width=0.8*a4ancho,fig.height=0.25*a4alto}
     library(datasets) # cargamos el paquete de datos de muestra
     head(cars,4);dim(cars) # vemos los primeros 4 elementos y las dimensiones de la tabla
 # Resumen de una de las variables o col de la tabla
@@ -105,16 +106,18 @@ Veamos unos ejemplos de código, en los que dibujamos un boxplot o gráfica de caj
     quantile(cars$speed) # los cuantiles
     names(cars) # nos devuelve los nombres de las variables en la tabla cars
 # 1ª GRAFICA EXPLORATORIA: BOXPLOT 
-    boxplot(cars$speed, col="lightgrey")
+    par(mfrow=c(1,2),mar=c(1,3,3,1))#mar=c(bottom, left, top, right)
+    boxplot(cars$speed, col="lightgrey",main="Gráfico de caja de una variable")
 # Si queremos añadir una linea al boxplot, por ejemplo para marcar el limite de 12
     abline(h=10, lty=3, lwd=2)
-# 2ª GRAFICA EXPLO. HISTOGRAMA DE UNA VARIABLE    
-    hist(cars$speed, col="green")
+# 2ª GRAFICA EXPLO. HISTOGRAMA DE UNA VARIABLE  
+    par(mar=c(5,5,3,1))#mar=c(bottom, left, top, right)
+    hist(cars$speed, col="wheat")
     # La funcion rug() pinta una marca bajo cada punto de datos 
     # graficas de histograma 1 dimension
     rug(cars$speed)
 ```
-
+\clearpage 
 
 ## Gráficos más complejos <a name="g2d"></a>
 
@@ -122,11 +125,11 @@ Si queremos ver mas de una variable, podemos repetir el proceso de pintado anter
 
 Vamos a hacer un ejemplo en el que generamos 2 series aleatorias de 500 observaciones y medias 4 y 6. Usamos en los colores el atributo `alpha=0.5` para generar transparencia.
 
-```{r eval=TRUE}
+```{r eval=TRUE, fig.cap="Dos histogramas juntos",fig.width=0.9*a4ancho,fig.height=0.33*a4alto}
     set.seed(42) # iniciamos semilla aleatoria
     # Pintamos la 1 grafica
     hist(rnorm(500,4),xlim=c(0,10),col='skyblue',border=F, 
-         main="Juntar dos histogramas", xlab="x" , ylab="frecuencia")
+         main="Dos histogramas juntos", xlab="x" , ylab="frecuencia")
     # Pintamos segunda grafica encima
     hist(rnorm(500,6),add=T,col=scales::alpha('red',.5),border=F, xlab="x") 
 ```
@@ -135,57 +138,76 @@ Tambien podemos usar las funciones `boxplot` o `with`para pintar varias variable
 Por ejemplo cuando comparamos dos variables x ~ y es muy útil la función `with(dataframe, plot(x,y,...))`
 donde la `x` e `y` se sustituyen por nombres de columnas en la dataframe.
 Una fórmula parecida usa la función `boxplot(x~y,data=dataframe, ...)`.
-```{r eval=TRUE, warning=FALSE}
+```{r eval=TRUE, fig.cap="uso de la funcion with", fig.width = 0.8*a4ancho, fig.height = 0.3*a4alto}
 # Grafica X~Y usando los datos de la df cars
     with(cars, plot(speed,dist,col=rgb(0,.5,.5,0.3),pch=19, cex=2)) # cex= tamaño 2x puntos
-# Tambien boxplot vale para pintar varias series
-    micolor <- rainbow(7, v=0.5,alpha=0.1)
+```
+Usando una de las variables como factor podemos sacar un gráfico muy completo usando graficas simples:
+```{r eval=TRUE, fig.cap="uso boxplot para sacar graficas complejas", fig.width = 0.8*a4ancho, fig.height = 0.3*a4alto}
+# Tambien boxplot vale para pintar varias series usando una variable como factor de color
+    micolor <- rainbow(7, v=0.5,alpha=0.5)
     boxplot(dist ~ speed ,data=cars, col=micolor, xlab="distancia",
         ylab="velocidad", main= "comparar distancia vs velocidad")
 ```
 
-## Gráficos multiples
+\clearpage 
 
-Llamamos gráficos multiples cuando dividimos el espacio de trabajo o lienzo en varios rectangulos y pintamos una gráfica en cada zona. Esta caracteristica se controla con la función `par()`que detallaremos más adelante, pero resaltamos el atributo `mfrow=c(num_filas,num,col)` que es muy útil para crear multigraficas.
+## Gráficos múltiples
+
+Llamamos gráficos multiples cuando dividimos el espacio de trabajo o lienzo en varios rectangulos y pintamos una gráfica en cada zona. Esta característica se controla con la función `par()`que ampliaremos más adelante, pero resaltamos ahora el atributo `mfrow=c(num_filas,num,col)` que es muy útil para crear multigraficas.
+
 Veamos un ejemplo simple:
 
-```{r eval=TRUE, warning=FALSE}
-# USO DE par() MULTIGRAFICAS 
-# dividimos la ventana grafica en 2 filas y 2 col
+```{r eval=TRUE,fig.cap="Multigraficas",fig.width=0.9*a4ancho,fig.height=0.4*a4alto}
+# USO DE par() en mMULTIGRAFICAS 
+# Dividir la ventana grafica en 2 filas y 2 col (4 graficas)
     par(mfrow=c(2,2), mar=c(4,4,2,1)) # 2 filas x 2 col, mar=c(bottom, left, top, right)
     hist(subset(pollution, region=="east")$pm25, col="lightgreen", main="Hist_1")
     hist(subset(pollution, region=="west")$pm25, col="lightblue", main="Hist_2")
+    
     with(pollution, plot(pm25,pollution$longitude,col=rgb(0,.2,.2,0.3),pch=19, cex=1)) 
     boxplot(pollution$pm25,col="lightgrey",horizontal=TRUE)
     dev.off() #salimos del entorno multigrafico
+    
 ```
 
 ## Gráficos de dispersión (SCATTERPLOT)  <a name="sc"></a>
+Otros gráficos habituales son los llamados de dispersión o scatterplot en inglés.
 
-Otra forma común de pintar datos es usando las gráficas de dispersión o scatterplot en inglés.
-Para hacerlos en R usamos dos funciones  `plot` y `with`
+Para hacerlos en R usamos dos funciones `plot` y `with`
 
 1. `plot(y ~ x, data = unatabla)` o `plot(x,y, col=x1)`  
     el símbolo ~ se hace con la tecla AltGr + 4.
 2. `with(unatabla, plot(y, x))`
 
-Se trata de funciones poderosas, pues nos dan acceso tambien a opciones de agrupamiento automático, si seleccionamos un factor como variable en algún atributo de color.Es decir, podemos pintar de distintos colores = agrupar datos según una de las variables si tomamos dicha variable como factor y lo añadimos como atributo en color `(col= variable_factor)`. 
-```{r eval=TRUE}
+Se trata de funciones poderosas, pues nos dan acceso simple a opciones de agrupamiento automático. 
+
+Si seleccionamos un factor como variable en alguno de los atributos de color del gráfico `(col= variable_factor)`, el resultado del mismo es una gráfica compleja que agrupa los datos según dicha variable seleccionada. El resultado es el equivalente a hacer split a los datos y pintar cada subgrupo, pero de forma muy sencilla.
+
+Veamos un ejemplo . 
+```{r eval=TRUE,fig.cap="Uso de agrupamiento de datos en el gráfico",fig.width=0.8*a4ancho,fig.height=0.3*a4alto}
 # creamos una multigrafica de 1fila x 2col 
     par(mfrow=c(1,2))
 # pintamos los datos x~y
     with(pollution,plot(latitude,pm25,col=micolor, pch=20))
     abline(h=12,lwd=2,lty=2)
-# Ahora hacemos lo mismo pero distinguiendo por colores según la variable region.
+# Ahora hacemos lo mismo pero ahora distinguiendo por colores según la variable "region".
     with(pollution,plot(latitude,pm25, col=region, pch=20))
     abline(h=12,lwd=2,lty=2)
-    dev.off()
+#    dev.off()
+```
+
+Otra posibilidad es hacer graficas x~y de dispersión de subgrupos de datos. Puede escribirse el código directamente en la linea de llamanda al comando plot como veremos en este ejemplo:
+
+```{r eval=TRUE,fig.cap="Hacer subgrupos de los datos en la misma llamada al gráfico",            fig.width=0.8*a4ancho,fig.height=0.4*a4alto}
 ## multiples scatterplots
-    par(mfrow=c(2,1), mar=c(5,4,2,1)) 
+    par(mfrow=c(2,1), mar=c(2,4,2,1)) 
         with(subset(pollution, region=="west"),plot(latitude,pm25, main="WEST"))
         with(subset(pollution, region=="east"),plot(latitude,pm25, main="EAST"))
-    dev.off()
+#   dev.off()
 ```
+
+\clearpage 
 
 # DISPOSITIVOS GRÁFICOS <a name="dgraf"></a>
 
@@ -204,7 +226,7 @@ Para ver qué dispositivos gráficos hay en nuestro sistema escribimos `?Devices` 
 * `plot`, `xyplot`, `qplot` son funciones que envían por defecto el grafico al dispositivo "pantalla". Aunque podemos especificar otra salida diferente como por ejemplo un fichero que nos permita almacenar la imagen de nuestro gráfico de forma independiente.
 
 
-## Como se crea un gráfico
+## Cómo se crea un gráfico
 
 Llamando explícitamente al dispositivo se crea.
 Una vez aierto se convierte en el dispositivo activo y sobreescribe en él todas las llamadas a pintar.
@@ -214,6 +236,12 @@ Para cerrar especificamente un dispositivo llamamos a la función `dev.off()`
 pdf(file = "myplot.pdf")
     plot(x,y) # pintamos en el 
 dev.off()     # salimos del dispositivo
+
+# otro ejemplo con png
+# plot to png 
+png('plot6.png',height = 500, width=600, units = "px")
+    plot(x,y)
+dev.off()
 ```
 
 ## Salida en fichero
@@ -224,8 +252,8 @@ A grandes rasgos, existen los ficheros vectoriales y los raster.
     * Pros: bueno para graficos lineales, cambiar tamaño sin perder calidad sin distorsión.
     * Contras: no son buenos cuando hay gran cantidad de puntos/datos que pintar.
 2. Raster (png, jpeg, tiff o bmp.)
-    * Pros: good for plot with lots of points
-    * Contras: doesn't resize well
+    * Pros: bueno para salidas con muchos puntos
+    * Contras: no se amplian bien, pierden calidad.
 
 ## Múltiples dispositivos gráficos
 
@@ -235,25 +263,35 @@ Podemos abrir muchos dispositivos, pero solo podemos pintar desde R en uno cada 
 * `dev.set(integer)`--> establece el dispositivo indicado en `integer` como actual.
 
 ## Copiar gráficas entre dispositivos
-Se pueden copiar los graficos desde un dispositivo a otro diferente, por ejemplo cuando queremos grabar el grafico en pantalla en un fichero:
+Se pueden copiar los graficos desde un dispositivo a otro diferente, por ejemplo cuando queremos grabar el gráfico en pantalla en un fichero:
 
-```{r eval=TRUE}
-library(datasets)
-with(faithful,plot(eruptions,waiting)) # Crea un dibujo
-title(main="Datos de daños Geyser") # sobreescribimos el título
-dev.cur() # nos muestra cual es el grafic device por defecto ahora
-dev.copy(png, file = "myfile.png") # copia el dibujo a un fichero png
-dev.off() # cierra el dispositivo png.
+```{r eval=TRUE,echo=FALSE, fig.cap="pintaren fichero png",fig.width=0.8*a4ancho,fig.height=0.4*a4alto}
+    library(datasets)
+    with(faithful,plot(eruptions,waiting,pch=10)) # Crea un dibujo
+    title(main="Erupciones del geyser") # sobreescribimos el título
 ```
----
+```{r}
+    library(datasets)
+    with(faithful,plot(eruptions,waiting,pch=10)) # Crea un dibujo
+    title(main="Erupciones del geyser") # sobreescribimos el título
+    
+    dev.cur() # nos muestra cual es el grafic device por defecto ahora
+    dev.copy(png, file = "myfile.png") # copia el dibujo a un fichero png
+    dev.off() # cierra el dispositivo png.
+```
+
 Para copiar en un fichero pdf existe una funcion especifica `dev.copy2pdf`
 Ojo, pues los gráficos en fichero no tienen por qué mostrarse igual que en pantalla.
 
-# LOS PRINCIPALES SISTEMAS DE TRAZADO GRÁFICO EN R
-Existen cientos de maneras diferentes de crear una representación gráfica con R, tantas como paquetes de gráficos existen con dicho fin, pero hay 3 que han destacado por su sencillez, robuztez y uso generalizado son:
+\clearpage 
+
+# PRINCIPALES SISTEMAS DE TRAZADO GRÁFICO EN R
+Existen muchas maneras de crear una representación gráfica con **R**, miles de funciones se han programado para pintar datos y hay decenas de librerías gráficos en <[https://cran.r-project.org/>, pero hay tres que han destacado por su sencillez, amplias opciones y uso generalizado.
+
+Estas tres librerías son:
 
 1. **base plot system** o sistema base 
-    Es el sistema de pintado por defecto incluído en el núcleo de R. La idea básica es la misma que se tiene al pintar un lienzo de artista sobre el que se van añadiendo cosas una a una, creando capas de pintura o efectos. Existen muchas funciones diferenciadas y epecificas para cada labor: lineas, etiquetas, puntos, gráficas...
+    Es el sistema de trazado por defecto incluído en el núcleo de R. La idea básica es la misma que se tiene al pintar un lienzo de artista sobre el que se van añadiendo cosas una a una, creando capas de pintura o efectos. Existen muchas funciones diferenciadas y epecificas para cada labor: lineas, etiquetas, puntos, gráficas...
     Es una manera muy completa de crear, pero tiene el inconveniente de que, si no quieres los valores por defecto tendrás que saber cómo hacer cada cosa específica.
 2. **Lattice plot system**
     Los gráficos se crean de una vez. es bueno para muchas gráficas juntas en una página o pantalla.
@@ -273,7 +311,6 @@ El sistema base está incluido en las librerías del núcleo de R `graphics` y `grD
 
 Una de las **desventajas** del _sistema base_ es que no se puede "ir hacia atrás"" una vez lanzado un comando.
 
-
 ### Parámetros globales de 'plot' (par):
 Se usa `par()` para especificar estos parametros globales, tambien para ver el valor de estos parámetros actualmente `par("col")`. entre los muchos atributos que se especifican con `par` están:
 
@@ -290,15 +327,28 @@ Se usa `par()` para especificar estos parametros globales, tambien para ver el v
 * `mfrow`: divide el lienzo por el número de filas y columnas especificado. Se pinta por orden de filas.
 * `mfcol`: divide el lienzo por el número de filas y columnas especificado. Se pinta por orden de Columnas.
 
+Las opciones de personalizacion de par() son inmensas (72 para ser exactos), para ver todas podemos hacer la llamada siguiente:
+```{r}
+length(par())
+names(par()) # esto nos da los nombres de las opciones
+
+# para ver qué valores hay actualmente de cada atributo hacemos:
+par()$pin #Plot dimensions in inches
+par("pin") 
+par("lty") #default line type is solid
+```
+
 ![tipos de punto](imag/points.png)
 
 ![tipos de linea \label{lineas}](imag/lines.png)
 
 ### Funciones del Sistema Base 
+El sistema base contiene muchas fucniones de trazado, la principal y genérica es `plot(x,y,...)`, pero existen otras especificas para hacer lineas, puntos, segmentos, poner titulos...
 
-* `plot`: crea un gráfico. Según los datos hace uno u otro tipo.
+* `plot`: crea un gráfico. Según los datos hace uno u otro tipo `plot(x,y,type="n"..)`
 * `lines`: añade una linea a una gráfica.
 * `points`: añade puntos a una gráfica.
+* `segments`: pinta una linea entre dos puntos.
 * `with`: crea un gráfico de dispersión. `with(tabla, plot(colA,ColB))`
 * `text`: añade texto de etiquetas:`text(coorX,CoorY,"texto que se pone")`
 * `title`: añade el título.
@@ -306,11 +356,37 @@ Se usa `par()` para especificar estos parametros globales, tambien para ver el v
 * `axis`: añade las marcas y etiqueta de los ejes.
 * `legend`: añade legenda.
 
+### Plot
+Plot es la funcion generica a la que se pude llamar de diferentes maneras.
+La tipica llamada es:`ploy(x,y,type="b", main="titulo",xlab= "eje x", ylab="tit eje y")`
+
+Con la funcion `plot` podemos especificar el tipo de gráfico a pintar con el argumento `type` que puede tomar los siguientes valores:
+
+* "p" solo puntos,
+* "l" lineas solas,
+* "b" lineas y puntos,
+* "c" solo lineas aparte,
+* "o" para el tipo 'overplotted',
+* "h" para pintar un 'histograma',
+* "s" pasos de escalera,
+* "n" no pinta, pero ajusta la escala.
+
+Es muy util el tipo "n", pues al ser un sistema de capas,podemos ajustar los parametros principales de escala en la linea de codigo inicial o primera capa, y despues ir llamando funciones de grafiado especificas como lines, o points.
+
+Para espeficicar los títulos se usan los argumentos:
+* `main` --> para el titulo principal
+* `sub`  subtitulo
+* `xlab` descripcion eje x
+* `ylab` descripcion eje y
+
+
 ### Ejemplos con el Sistema Base 
 
-Podemos usar la función `example` para ver muchos ejemplos gráficos:
-`example(points)`
-```{r eval=TRUE}
+Podemos usar la función `example` para ver muchos ejemplos gráficos directamente en R:
+`example(points)` no da muchs ejemplo con graficos de puntos.
+
+Vamos a ver unos ejemplo con la base de datos de airquality.
+```{r eval=TRUE, fig.cap="Ejemplos con Base System",fig.width=0.7*a4ancho,fig.height=0.3*a4alto}
 library(datasets)
 # Usaremos en este ejemplo la data airquality que contiene medidas de ozono en NY en dias de 1973
 # ver primeras lineas tabla de datos
@@ -343,7 +419,12 @@ library(datasets)
     legend("topright",pch=c(17,8),col=c("blue","red"),legend=c("May","Other Months"))
 #añadimos una linea vertical:
     abline(v=median(airquality$Wind),lty=2, lwd=2)
+```
 
+Ahora ejemplos con varias gráficas usando `par()`.
+
+
+```{r eval=TRUE,fig.cap="Ejemplos de multigraficos con Base System",fig.width=0.7*a4ancho,fig.height=0.3*a4alto}
     # dos graficos juntos
     par(mfrow=c(1,2))
     plot(airquality$Wind,airquality$Ozone,main="Ozone and Wind")
@@ -357,10 +438,11 @@ library(datasets)
     mtext("Ozone and Weather in New York City",outer=TRUE)
 
 # with(tabla, plot(col,colB))
+    par(mfrow = c(1,2))
     with(airquality, plot(Wind,Ozone, main="Ozono y viento en NY",pch=20))
-# Añado que pinte los del mes de mayo en azul
+    # Añado que pinte los del mes de mayo en azul
     with(subset(airquality, Month==5), points(Wind,Ozone,col="blue"))
-# Añadimos una leyenda
+    # Añadimos una leyenda
     legend("topright", pch =1, col=c("blue","black"),legend=c("Mayo","otros"))
     #añadimos linea de regresion
     model<-lm(Ozone ~ Wind,airquality)
@@ -369,6 +451,10 @@ library(datasets)
 # Grafica de cajas boxplot
     airquality<-transform(airquality,Month=factor(Month))
     boxplot(Ozone ~ Month, airquality, xlab="mes", ylab="ozono ppb")
+```
+Para las graficas anteriores es interesante ver esta nueva manera de especificar las graficas todas en la misma linea de comandos de `with( datatable, {.......})` todo lo que se encuentra entre las llaves se ejecuta. 
+
+```{r}
 
 #EJEMPLO GRAFICOS MULTIPLES
 par(mfrow=c(1,2))# (filas, col)
@@ -380,69 +466,48 @@ with(airquality,{
 })
 
 ```
-Las opciones de personalizacion de par() son inmensas (72 para ser exactos), para ver todas podemos hacer la llamada siguiente:
-```{r}
-length(par())
-names(par()) # esto nos da los nombres de las opciones
 
-# para ver qué valores hay actualmente de cada atributo hacemos:
-par()$pin #Plot dimensions in inches
-par("pin") 
-par("lty") #default line type is solid
-```
+\clearpage 
 
+#### Ejemplo con escala temporal x
+Cuando la variable x es una fecha, el gráfico ajusta la escala x como temporal automáticamente.
+Vamos a ver un ejemplo de escala temporal y además multigráfica en el que usamos el atributo `type="n"` en la primera linea de plot, para definir la escala, pero no pintar la gráfica, y añadimos una a una el resto de gráficas al lienzo.
 
-#### Escala tempral de x
-Cuando la variable x es una fecha, el gráfico ajusta la escala x como temporal automáticamente:
-
-```{r}
-# plot 3
-png('plot3.png',width = 480, height = 480, units = "px")
-plot(data$DateTime, data$Sub_metering_1, ylab="Energy sub metering", xlab="", type="n")
-lines(data$DateTime, data$Sub_metering_1, type= "l", col="grey")
-lines(data$DateTime, data$Sub_metering_2, type= "l", col="red")
-lines(data$DateTime, data$Sub_metering_3, type= "l", col="blue")
-# Add legend
-legend("topright",legend=c("sub-metering_1","sub-metering_2","sub-metering_3"),col=c("black","red","blue"),lty=c(1,1,1),lwd=2)
-dev.off()
-```
-![plot3](imag/plot3.png) 
-
-Cuando queremos añadir varia gráficas sobre el mismo grafico y escala, usamos el atributo type="n" en la primera, para definir la escala pero no pintar la grafica, y añadimos una a una el resto de graficas al lienzo.
-En el siguiente ejemplo se pinta de este modo una gráfica compuesta en un fichero png
-
-** Plot 4** 
+Además se guarda en fichero la imagen.
 ```{r}
 # plot 4
 png('plot4.png')
-par(mfrow=c(2,2)) # all plots on one page 
+par(mfrow=c(2,2))
 
 plot(data$DateTime, data$Global_active_power, ylab="Global Active Power (kilowatts)", xlab="", type="n")
-lines(data$DateTime, data$Global_active_power, type= "l")
+    lines(data$DateTime, data$Global_active_power, type= "l")
 
 plot(data$DateTime, data$Voltage, ylab="Voltage", xlab="datetime", type="n")
-lines(data$DateTime, data$Voltage, type= "l")
+    lines(data$DateTime, data$Voltage, type= "l")
 
 plot(data$DateTime, data$Sub_metering_1, ylab="Energy sub metering", xlab="", type="n")
-lines(data$DateTime, data$Sub_metering_1, type= "l", col="grey")
-lines(data$DateTime, data$Sub_metering_2, type= "l", col="red")
-lines(data$DateTime, data$Sub_metering_3, type= "l", col="blue")
-legend("topright",legend=c("sub-metering_1","sub-metering_2","sub-metering_3"),col=c("black","red","blue"),lty=c(1,1,1),lwd=2)
+    lines(data$DateTime, data$Sub_metering_1, type= "l", col="grey")
+    lines(data$DateTime, data$Sub_metering_2, type= "l", col="red")
+    lines(data$DateTime, data$Sub_metering_3, type= "l", col="blue")
+    legend("topright",legend=c("sub-metering_1","sub-metering_2","sub-metering_3"),
+       col=c("black","red","blue"),lty=c(1,1,1),lwd=2)
 
 plot(data$DateTime, data$Global_reactive_power, ylab="Global_reactive_power", xlab="datetime", type="n")
-lines(data$DateTime, data$Global_reactive_power, type= "l")
+    lines(data$DateTime, data$Global_reactive_power, type= "l")
 
 dev.off()
 ```
 ![plot4](imag/plot4.png) 
 
+\clearpage
+
 ### Uso de colores
 Existen muchas maneras de especificar el color de los distintos elementos de una gráfica.
-Por ejemplo, un vector así: col=c(1:3), nos dá los 3 colores primarios.
+Por ejemplo, un vector así: `col=c(1:3)`, nos dá los 3 colores primarios.
 
 Existen 657 colores predefinidos en R, con nombre propio. Estos colores se almacenan en el vector `colors`. Si queremos generar una paleta de 10 colores podemos usar el comando `sample(colors(),10)` que nos da los nombres de 10 colores aleatorios de `colors`. Estos colores se pueden especificar directamente por su nombre como "red", "chocolate1" o "coral".
 
-Tambien existen paletas predefinidas con nombre que se almacenan en `RColorBrewer`como veremos más adelante, y podemos acceder a las mismas por su nombre ("heat.colors","topo.colors"....).
+También existen paletas predefinidas con nombre que se almacenan en `RColorBrewer`como veremos más adelante, y podemos acceder a las mismas por su nombre ("heat.colors","topo.colors"....).
 
 Si queremos personalizar los colores, R nos permite crear una paleta a gusto del usuario con los comandos `colorRamp` y `colorRampPalette` :
 
@@ -451,7 +516,7 @@ Si queremos personalizar los colores, R nos permite crear una paleta a gusto del
 El valor del color se toma de forma continua entre 0 y 1 y devuelve un color RGB.
 
 Veamos un ejemplo: Antes tambien definimos una función que nos será util para representar los colores de una paleta continua:
-```{r eval=TRUE, echo=TRUE}
+```{r eval=TRUE, echo=TRUE, fig.cap='Uso de colorRamp'}
 # Funcion para ver las escalas de color:
 # esta funcion pinta una grafica con los colores de la escala.
 verEscalas<-function(cv){
@@ -475,7 +540,7 @@ Es algo más intuitiva, pues definimos los colores base, y despues al llamarla ge
 
 Una de las ventajas de usar paletas personlizadas es que podemos definir tambien la transparencia de los colores mediante el argumento alpha, como veremos en el segundo ejemplo:
 
-```{r eval=TRUE, echo=TRUE}
+```{r eval=TRUE, echo=TRUE, fig.cap='Uso de colorRampPalette',fig.width=0.5*a4ancho,fig.height=0.25*a4alto}
 # Paleta usando colorRamPalette
     pal1<-colorRampPalette(c("red","blue", "green"))
     pal1(2) # retorna 2 colores con la paleta red blue green
@@ -496,7 +561,7 @@ La funcion rgb() es la base para la formación de colores, su uso es muy simple:
 Como vimos la funcion `colors()` almacena colores básicos con nombre propio, y `colorBrewer` almacena paletas predefinidas, pero ojo se trata de un **paquete** opcional, que hay que instalar.
 Una vez instalado se hace una llamada a `brewer.pal(num_colores,"nombre_paleta"), depues usamos `colorRampPalette` tal y como lo vimos en apartados anteriores:
 
-```{r eval=TRUE, echo=TRUE}
+```{r eval=TRUE, echo=TRUE, fig.cap='Uso de RColorBrewer',fig.width=0.5*a4ancho,fig.height=0.25*a4alto}
 library("RColorBrewer") # cargamos librería
 # Genera una paleta de 3 colores basados en la paleta  "BuGn"
     cols<-brewer.pal(3,"BuGn")
@@ -510,6 +575,7 @@ library("RColorBrewer") # cargamos librería
     image(volcano, col=pal(20))
 ```
 
+\clearpage
 
 ## Lattice plotting system
 
@@ -554,8 +620,8 @@ xyplot(y ~ x | f * g, data)
 
 #### Ejemplos con lattice
 
-Grafica de 5 subgráficas en 2 lineas:
-```{r eval=FALSE}
+Gráfica de 5 subgráficas en 2 lineas:
+```{r eval=TRUE, fig.cap="ejemplo multigraficas con Lattice 1"}
 library(lattice)
 library(datasets)
 # ojo que xyplot pinta ozone como eje y y wind en eje x es decir y~x
@@ -565,14 +631,14 @@ airquality <- transform(airquality, Month = factor(Month))
 xyplot(Ozone ~ Wind | Month, data = airquality, layout = c(5, 1))
 
 #tambien se puede poner:
-xyplot(Ozone ~ Wind | as.factor(Month), data = airquality, layout=c(5,1)) 
+#xyplot(Ozone ~ Wind | as.factor(Month), data = airquality, layout=c(5,1)) 
 ```
 
 Nuevo ejemplo:
 
-```{r eval=FALSE}
-library(lattice)
-library(datasets)
+```{r fig.cap="ejemplo multigraficas con Lattice 2",fig.width=0.9*a4ancho,fig.height=0.3*a4alto}
+ library(lattice)
+ library(datasets)
 #usaremos la bd state
 head(state)
 # vamos a ver las categorias que hay en la veriable region
@@ -582,36 +648,29 @@ table(state$region)
 xyplot(Life.Exp ~ Income | region, data = state, layout = c(4, 1))
 #si cambiamos la plantillaa 2x2
 xyplot(Life.Exp ~ Income | region, data = state, layout = c(2, 2))
-
-xyplot(Ozone ~ Wind, data = airquality)
 ```
 
-Múltiples gráficos factores uso de panel:
-```{r}
-set.seed(10)#genera semilla para aleatorio
-x<-rnorm(100) # genera 100 num normales 0-1
-f<- rep(0:1,each=50) # repite 0, 50 veces y 1 otras 50
-y<-x+f-f*x+rnorm(100,sd=0.5)
-f<-factor(f,labels=c("Grupo 1", "Grupo 2"))
-library(lattice)
-xyplot(y~x | f, layout=c(2,1)) # pinta 2 subgraficas
-
-```
 
 ### Lattice panel 
-Lattice tiene un **_panel functions_**  que controla que pasa dentro de cada panel, que en parte suple las anotaciones que se hacen en el sistema base para personalizar el gráfico.
+Lattice tiene un **_panel functions_**  que controla qué pasa dentro de cada panel, que en parte suple las anotaciones que se hacen en el sistema base para personalizar el gráfico.
 
-Es muy interesante para añadir lineas, medias o modelos de regresion a los datos en lattice, veamos un ejemplo con los datos anteriores:
+Es muy interesante para añadir lineas, medias o modelos de regresion a los datos en lattice.
+Veamos un ejemplo con datos generados aleatorios:
 
-```{r eval=FALSE}
-# Panel functions
-# Personalizar el grafico anterior con panel
-xyplot(y~x | f, panel= function(x,y,...){
-    panel.xyplot(x,y,...) # llamamos a pintar
-    panel.abline(h=median(y),lty=2) # añadimos linea horizontal en la media
-    panel.lmline(x,y,col=3)# añade una linea de regresion
-} )
-
+```{r eval=TRUE,fig.cap="Modelos en multigraficas con Lattice 3",fig.width=0.9*a4ancho,fig.height=0.3*a4alto}
+ library(lattice)
+# Generamos serie aleatoria
+    x <- rnorm(100) # genera 100 numeros normales entre 0-1
+    f <- rep(0:1,each=50) # repite 0 50 veces y 1 otras 50
+    y<-x+f-f*x+rnorm(100,sd=0.5)
+    
+    f<-factor(f,labels=c("Grupo 1", "Grupo 2"))
+# Pintamos la sereie
+    xyplot(y~x | f, panel= function(x,y,...){
+        panel.xyplot(x,y,...) # llamamos a pintar
+        panel.abline(h=median(y),lty=2) # añadimos linea horizontal en la media
+        panel.lmline(x,y,col=3)# añade una linea de regresion
+    } )
 ```
 ### RESUMEN LATTICE
 
@@ -634,11 +693,12 @@ p2 <- xyplot(y ~ x | f, panel = function(x, y, ...) {
 xyplot(y~x|zcol*tfila,data=diamonds,strip=FALSE,pch=20,xlab="myxlab",ylab="myylab",main="mymain")
 ```
 
+\clearpage
 
 ## ggplot2
 
 [ggplot2](http://ggplot2.org) es una mezcla de lattice y base system. Lo más importante respecto a **lattice** es que permite sobrescribir encima de una gráfico de forma intuitiva y que usa una gramática gráfica que lo hace más sencillo.
-Se ha convertido por meritos propios en el 3er sistema importante para representar graficos en R.
+Se ha convertido por meritos propios en el prieme sistema grafico de R por su uso.
 
 **ggplot2** es la librería o paquete actualizado de ggplot, que fue la primera implementación de este código en R.
 
@@ -669,25 +729,21 @@ Es importante tener en cuenta el uso de factores para dibujar subconjuntos de da
 
 #### Ejemplo simple
 
-```{r}
+```{r, eval=TRUE,fig.cap="Grafica simple con ggplot",fig.width=0.8*a4ancho,fig.height=0.33*a4alto}
 # installation
-install.packages("ggplot2")
+if (!require("ggplot2")) install.packages("ggplot2")
 library(ggplot2)
 library(datasets)
 #usaremos la data mpg que contiene datos de consumo de coches 
-dim(mpg)
 str(mpg)
 head(mpg)
-# solo para informar ..cuantos datos por modelo de coche
-# usamos comando table
-table(mpg$model)
 
 # grafico simple
 #pintamos con qplot(varA, varB, data=BD)
 qplot(displ, hwy, data = mpg)
 ```
 
-#### Subconjuntos con factores
+#### Subconjuntos gráficos usando factores
 
 Si añadimos una de las variables (*factores*) a la llamada de qplot (variable *drv*), vemos que automáticamente el gráfico nos distingue por colores los datos:
 
@@ -698,95 +754,121 @@ qplot(displ, hwy, data = mpg, color = drv, geom = c("point", "smooth"))
 Puede ser muy util en la conversion a factores los siguientes comandos de R:
  * `cut(variable, breaks= num_particiones, labels=c("nombres_paracada_particion"))`
  
-```{r eval=FALSE}
+```{r eval=TRUE,fig.cap="Uso de factores ggplot",fig.width=0.8*a4ancho,fig.height=0.33*a4alto}
 airquality <- transform(airquality, Month = factor(Month))
 qplot(Wind, Ozone, data = airquality, facets = . ~ Month) 
 ```
 
-#### Estadisticas añadir modelo regresión
 
-Podemos añadir de manera muy simple modelos estadísticos al gráfico basado en los datos del mismo.
-Por ejemplo añadimos al modelo anterior, una linea de regresión suavizada:
-
-```{r eval=FALSE}
-qplot(displ, hwy, data = mpg, geom = c("point", "smooth"))
-
-#boxplot
+#### Boxplot con qplot
+Para hacer graficos de caja con ggplot y qplot usamos el atributo `geom="boxplot"`. 
+```{r eval=FALSE,fig.cap="Boxplot con qplot de ggplot",fig.width=0.8*a4ancho,fig.height=0.33*a4alto}
+# boxplot
 qplot(drv, hwy, data = mpg, geom="boxplot")
-qplot(drv, hwy, data = mpg, geom="boxplot", color=manufacturer)
+#qplot(drv, hwy, data = mpg, geom="boxplot", color=manufacturer)
 ```
 
 #### Histogramas
 
-Para hacer sistogramas debemosespecificar una sola variable, aunque podemos añadir otras variables como factores o subconjuntos. En este caso debemos usar el argumento `fill` que especifica el color de relleno de las barras.
+Para hacer Histogramas debemos especificar una sola variable de la tabla origen, aunque podemos añadir otras variables como factores o subconjuntos para hacer los histogramas mucho más atractivos e informativos.
 
-```{r eval=FALSE}
+En este caso usaremos el argumento `fill` que especifica el color de relleno de las barras con una variable factor.
+
+```{r eval=FALSE,fig.cap="Histogramas con qplot/ggplot",fig.width=0.8*a4ancho,fig.height=0.33*a4alto}
 qplot(hwy, data = mpg, fill = drv)
-
 ```
 
-#### Facets (multiples gráficas)
+#### Graficos de barras
+Ver esta web con muchos ejemplos <http://docs.ggplot2.org/0.9.3.1/geom_bar.html>
 
-Es como el comando *panels* en lattice. Si queremos distinguir subconjuntos en diferentes gráficas, una opcion que vimos antes es por colores en la misma grafica y otra sería separando cada subconjunto en diferentes gráficas con `facets`.
-We want distinguish different subsets of a dataframe. One
-option is use different color code, another is to use different panels.
+```{r eval=TRUE,fig.cap="grafico de barras con qplot/ggplot",fig.width=0.8*a4ancho,fig.height=0.33*a4alto}
+qplot(factor(cyl), data=mtcars, geom="bar", fill=factor(cyl)) + 
+    theme(legend.position="top") +
+    theme(legend.text = element_text(colour="blue", size=6)) +
+    theme(legend.title = element_blank())
 
-facets se introduce como dos variables separadas por este simbolo `~`. a la izquierda indica las columnas y a la derecha las filas (variable usada para distinguir filas). Si no se especifica variable se debe poner `.`
+# Stacked bar charts
+qplot(factor(cyl), data=mtcars, geom="bar", fill=factor(gear))
+```
+
+#### Facets (multigraficas en ggplot)
+
+Es como el comando *panels* en lattice o el comando `par()` del *base system*. 
+Si queremos distinguir subconjuntos en diferentes gráficas, una opcion que vimos antes es por colores en la misma gráfica y otra es separando cada subconjunto en gráficos independientes con `facets`.
+
+`facets` se introduce como dos variables separadas por este simbolo `~`. a la izquierda indica las columnas y a la derecha las filas (variable usada para distinguir filas). Si no se especifica variable se debe poner `.` (un punto).
 
 Veamos un ejemplo:
-```{r eval=FALSE}
+```{r eval=TRUE, fig.cap="Facets paneles con qplot/ggplot",fig.width=0.7*a4ancho,fig.height=0.33*a4alto}
+# para cada valor de drv una grafica independiente (una columan nueva)
 qplot(displ, hwy, data = mpg, facets = . ~ drv)
-qplot(hwy, data = mpg, facets = drv ~ ., binwidth = 2)
+# para cada valor de drv una grafica en fila nueva
+qplot(hwy, data = mpg, facets = drv ~ ., binwidth = 1)
+```
+#### Funciones estadísticas (modelo regresión)
+
+ggplot tienen la posibilidad de añadir de manera simple modelos estadísticos y de regresión al gráfico.
+Por ejemplo añadimos al modelo anterior, una linea de regresión suavizada:
+
+```{r eval=TRUE,fig.cap="Añadir modelo de regesión ggplot",fig.width=0.8*a4ancho,fig.height=0.3*a4alto}
+qplot(displ, hwy, data = mpg, geom = c("point", "smooth"))
 ```
 
 #### Funciones estadísticas (densidad)
+
 Con ggplot podemos sacar directamente la función de densidad de la variable de muestreo llamando al argumento `geom = "density`. Las funcion de densidad nos da la probabilidad de cada valor de muestreo en base al conjunto de valores. (el area bajo la curva suma 1).
+Al igal que en el resto de funciones, al añadir una variable como color, nos pinta de forma diferenciada las agrupaciones para cada valor de la variable seleccionada como color.En el ejemplo veremos las graficas de densidad para la tabla de diamantes según el tipo de corte.
 
-```{r eval=FALSE}
-
+```{r eval=TRUE,fig.cap="Función de densidad con ggplot",fig.width=0.8*a4ancho,fig.height=0.3*a4alto}
 qplot(price,data=diamonds,geom="density") # nos da la funcion de densidad o probabilidad
 qplot(price,data=diamonds,geom="density",color=cut)
-
-# con otra data
-qplot(log(eno),data=maacs, fill=mopos) #histograma con factor 
-qplot(log(eno), data = maacs, geom = "density")
-qplot(log(eno), data = maacs, geom = "density", color = mopos)
 ```
 
-#### Graficos de dispersión X-Y Scatterplot
+\clearpage 
+
+#### Gráficos de dispersión X-Y Scatterplot
 
 Para separar subconjuntos por color o forma de los puntos usaremos como argumento `color` o `shape` con una variable factor.
 Podemos además incluir lineas suavizadas en los datos con el argumento: `method`.
 
-```{r eval=FALSE}
+```{r eval=TRUE,fig.cap="Ejemplo de dispersion con ggplot",fig.width=0.8*a4ancho,fig.height=0.32*a4alto}
 # subconjuntos por forma
-qplot(log(eno), log(pm25), data = maacs, shape = mopos)
-# subconjuntos por color
-qplot(log(eno), log(pm25), data = maacs, color = mopos)
+head(pollution,5)
+#usamos los datos de pollution
+qplot(longitude, log(pm25), data = pollution, shape = region, color=region)
+
 # Añadir liea de regresión suavizada
-qplot(log(eno), log(pm25), data = maacs, color = mopos, geom = c("point", "smooth"), method = "lm")
+qplot(longitude, log(pm25), data = pollution, shape = region,
+      facets = . ~ region,
+      color=region, geom = c("point", "smooth"))
 # otra forma: distinguiendo por color
-qplot(log(eno), log(pm25), data = maacs, color = mopos) +
+qplot(longitude, log(pm25), data = pollution, shape = region) + 
     geom_smooth(method = "lm")
-
-# separate by facets argument
-qplot(log(eno), log(pm25), data = maacs, facets = . ~ mopos, geom = c("point", "smooth"), method = "lm")
-
-# con la data diamons
-qplot(carat,price,data=diamonds, color=cut) + geom_smooth(method="lm")
 ```
 
-#### Summary of qplot
-En resumen qplot, que es la funcion más simple de la librería ggplot2, es una forma simple de trazar gráficos, pero que da resultados esteticamente buenos y muchas opciones de trazado.
+Como veremos más adelante, es posible incluir funciones de ggplot en qplot que es la version simplificada.
+Así por ejemplo para incluir un modelo de resgresion lineal podríamos hacerlo así:
+```{r}
+# con la data diamons
+qplot(carat,price,data=diamonds, color=cut) 
+    + geom_smooth(method="lm")
+```
 
- geom--	Specifies the geometric objects that define the graph type. The geom option is expressed as a character vector with one or more entries. geom values include "point", "smooth", "boxplot", "line", "histogram", "density", "bar", and "jitter"
+\clearpage 
 
-**HOJA RESUMEN DE GRAFICOS qplot:**
+#### Resumen de qplot
+En resumen qplot, que es la funcion más simple de la librería ggplot2, es una forma simple de pintar gráficos que da resultados esteticamente buenos y muchas opciones de trazado.
+
+La forma básica de llamar a qplot es:
+`qplot(x,y,data=dataframe, geom="line", facets= . ~ varA)`
+
+El tipo de gráfico lo definimos con `geom`que puede tomar un valor simple o un vector con varias opciones que se suman. Los tipos de geometria son: `"point", "smooth", "boxplot", "line", "histogram", "density", "bar", "jitter"`
+
 
 ```{r}
+par(mfrow=c(1,2))
 # grafico simple
 qplot(displ,data = mpg)
-
 # Añadir otra variable a la grafíca por colores
 qplot(displ, data = mpg, fill = drv)
 # X-Y grafica  
@@ -815,8 +897,9 @@ qplot(displ, hwy, data = mpg, geom=c("point","smooth"),facets = . ~ drv)
 qplot(carat,price,data=diamonds, color=cut, facets = .~cut) + geom_smooth(method="lm") 
 ```
 
+
 ### ggplot
-Cuando queremos personalizar más profundamente una gráfica con el paquete ggplot2 tenemos que dejar la función básica `qplot` por la completa o de más bajo nivel que es: `ggplot`
+Cuando queremos personalizar aún más una gráfica con el paquete ggplot2 tenemos que dejar la función básica `qplot` por la completa o de más bajo nivel que es: `ggplot`
 
 Usando esta funcion podemos personalizar todo. `ggplot`contiene 7 funciones básicas que son:
 
@@ -831,45 +914,36 @@ Usando esta funcion podemos personalizar todo. `ggplot`contiene 7 funciones bási
 #### Construir gráficos con ggplot2
 
 El sistema usado por ggplot2 es como el de un artista ante un lienzo, las gráficas se construyen con **capas**: la capa de datos, la de anotaciones encima etc.
+El grafico básico es `ggplot(dataframe, aes(variableX,variableY))`
 
-Veamos un ejemplo sencillo para verlo usando la base de datos de ejemplo **mpg** del paquete `datasets`: 
+Veamos un ejemplo sencillo con la base de datos de ejemplo **mpg** del paquete `datasets`: 
 
-```{r}
-install.packages("ggplot2")
+```{r eval=TRUE,fig.cap="uso de ggplot",fig.width=0.8*a4ancho,fig.height=0.32*a4alto}
+#install.packages("ggplot2")
 library(ggplot2)
 library(datasets)
-
-# usaremos la data mpg que contiene datos de consumo de coches 
-# vemos la df con los comandos resumen
-dim(mpg)
-str(mpg)
-head(mpg)
-
-# llamamos a ggplot almacenandolo en una variable y añadiendo las capas
+# llamamos a ggplot y almacenamos en una variable donde vamos añadiendo las capas
 g <- ggplot(mpg, aes(displ,hwy)) + #aes(x,y)
     geom_point() + #añadimos un x-y =scatterplots
     geom_smooth(method="lm") # añadimos un linear model
     # + facet_grid(.~drv)
 print(g)
-
-# esto sería equivalente a lo anterior con qplot:
-qplot(displ, hwy, data = mpg, geom=c("point","smooth"),facets = . ~ drv)
-
+# esto mismo con qplot sería equivalente a:
+#qplot(displ, hwy, data = mpg, geom=c("point","smooth"),facets = . ~ drv)
 ```
 
 
-#### Anotaciones en ggplot
+#### Anotaciones y temas en ggplot
+Para añadir anotaciones, titulos etc. al grafico usaremos las funciones `xlab`, `ylab`, `lab` y `ggtitle`. Para cada funcion hay muchas opciones.
 
-* Etiquetas: `xlab`, `ylab`, `lab`, `ggtitle`
-* Para cada funcion hay muchas opciones
-* Existen temas globales con conjuntos de colores establecidos `theme()`:
-    * `theme_gray()`, `theme_bw()`
-    * o se pueden hacer:`theme(legend.position = "none")`
+Resaltamos que existen temas o paletas ya almacenadas en ggplot como conjuntos de colores predefinidos, que nos sirven para cambiar de forma global el aspecto del gráfico con el comando  `theme()`, por ejemplo `theme_gray()` para que la grafica use solo grises o `theme_bw()` para una salida en blanc y negro por ejemplo para su uso en libros o copias.
+
+Tambien se puede definir un tema o personaliza:`theme(legend.position = "none")`
     
-Seguimos con el ejemplo anterior, pero ampliando las opciones: 
+Veamos en acción estas caracteristicas: 
     
     
-```{r}
+```{r eval=TRUE,fig.cap="uso de ggplot con temas",fig.width=0.8*a4ancho,fig.height=0.32*a4alto}
 # llamamos a ggplot almacenandolo en una variable y añadiendo las capas
 g <- ggplot(mpg, aes(hwy,displ)) + #aes(x,y)
     geom_point(color="steelblue", size=2, alpha=1/2) + #añadimos un x-y =scatterplots
@@ -878,8 +952,10 @@ g <- ggplot(mpg, aes(hwy,displ)) + #aes(x,y)
     labs(title = "frenazos de coches") + # podia usarse ggtitle("frenazos de coches")
     labs(x = "m", y = "Desplazamiento") 
 print(g)
+``` 
 
 
+```{r}
 g <- ggplot(mpg, aes(hwy,displ)) + #aes(x,y)
     geom_point(color="steelblue", size=2, alpha=1/2) + #añadimos un x-y =scatterplots
     geom_smooth(size = 2, linetype = 2, method = "lm", se = FALSE) +# añadimos un linear model
@@ -895,24 +971,24 @@ print(g)
 # sustituimos geom_point por:
 # geom_point(aes(color=drv), size=4,alpha=1/2)
 # si los valores no son constantes debemos usar aes(), no valdría color=drv 
-```    
+   
+```
+
 
 #### Gráfico de cajas
-```{r}
+```{r eval=TRUE,fig.cap="Grafico de cajas con ggplot",fig.width=0.8*a4ancho,fig.height=0.32*a4alto}
 ggplot(diamonds,aes(carat,price))+
     geom_boxplot()+
     facet_grid(.~cut)
 ```
 
-
-
-
 #### Limitar ejes
 
-Algunas veces queremos centar la gráfica en los datos principales y no en los extremos fuera de rango, para hacerlo podemos cambiar simplemente los ejes, pero ojo, pues al usar `ylim`, estamos excluyendo los datos que se salgan de esos limites de la gráfica, y a veces es un inconveniente.
+Algunas veces queremos centar la gráfica en los datos principales y no en los extremos fuera de rango, para hacerlo podemos cambiar simplemente los ejes, pero ojo, pues al usar `ylim`, estamos **excluyendo** los datos que se salgan de esos limites en ggplot.
+
 Es mejor usar un cambio de coordenadas, para así mantener los datos, pero cambiar solo,los limites:
 
-```{r eval=FALSE}
+```{r}
 #generamos una serie aleatoria
 testdata<-data.frame(x=1:100,y=rnorm(100))
 testdata[50,2]<-100 # cambiamos el valor de la fila 50, col 2 por 100
@@ -920,7 +996,6 @@ testdata[50,2]<-100 # cambiamos el valor de la fila 50, col 2 por 100
 plot(testdata$x,testdata$y,type= "l", col="blue")
 # quitamos el outlier de la vista
 plot(testdata$x,testdata$y,type= "l", col="blue", ylim = c(-2,2))
-
 
 # ahora lo mismo usando ggplot, ojo que se excluyen los datos extremos
 g<-ggplot(testdata,aes(x,y)) +
@@ -931,22 +1006,40 @@ g<-ggplot(testdata,aes(x,y)) +
 g1<-ggplot(testdata,aes(x,y)) +
     geom_line() +
     coord_cartesian( ylim=c(-3,3)) 
+```
+#### Paneles
 
+El equivalente al facet de qplot es `facet_grid()` en ggplot, tambien `facet_wrap(~)`. wrap es usado cuando la variable factor que vamos a usar tiene muchas categorías, entonces las pinta no solo en una fila o columna sino en todo el espacio. 
+Su uso es igual, tan solo anotar que añadiendo `margins = TRUE` se añade una col o fila nueva con el total comparado por fila.
+
+```{r}
 #con paneles
-g2<-ggplot(mpg, aes(x = displ, y = hwy,color=factor(year))) +
-    geom_point()+
-    facet_grid(drv~cyl,margins = TRUE) # margins añade una col o fila nueva con el total comparado
-
-g3<-ggplot(mpg, aes(x = displ, y = hwy,color=factor(year))) +
+ggplot(mpg, aes(x = displ, y = hwy,color=factor(year))) +
     geom_point() +
     facet_grid(drv~cyl,margins=TRUE)+
     geom_smooth(method="lm",size=2,se=FALSE,color="black") +
     labs(x="Displacement",y="Highway Mileage",title="Swirl Rules!")
+
 ```
 
+
+```{r eval=TRUE,fig.cap="Paneles con ggplot",fig.width=0.8*a4ancho,fig.height=0.32*a4alto}
+library(ggplot2)
+library(datasets)
+# ejemplo con facet_wrap
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  facet_wrap(~class)
+```
+
+
 #### Factores
-para distingur valores en los graficos es muy util convertir en factores las variables y pintar estos factores con diferentes colores..
-Si la variable es un factor no hay problema, pero si no lo es debemos transformarla, por ejemplo si es numerica podemos usar `cut`para crear un factor, cortando los datos en trozos:
+Para distingur valores en los gráficos ya hemos visto lo util que es convertir en factores algunas de las variables y así usarlas como factor de agrupamiento en las gráficas.
+
+Si la variable es un factor no hay problema, pero, si no lo es debemos transformarla.
+Por ejemplo si la variable es numerica podemos usar la funcion `cut` para crear un factor, cortando los datos en trozos.
+Vamos a ver un ejemplo con la variable diamonds$carat de la dataframe diamons.
+
 ```{r}
 # dividir en 3 partes iguales una variable numerica diamonds$carat
 # calculamos los puntos de corte 3+1=4
@@ -960,7 +1053,7 @@ diamonds$car2<-cut(diamonds$carat,cutpoints)
 
 
 
-#### Ejemplo complejo
+#### Ejemplo complejo de ggplot
 
 ```{r eval=FALSE}
 # Calculate the deciles of the data
@@ -981,12 +1074,26 @@ g + geom_point(alpha = 1/3)
   + lebs(title = "MAACS Cohort")
 ```
 
-### Summary of `ggplot`
+\clearpage 
 
-* Very powerful and flexible
+### RESUMEN de `ggplot`
+Es una funcion poderosa y flexible que tiene tanto la version sencilla qplot, como la de bajo nivel ggplot.
+Una de las ventajas más notorias es la posibilidad de ir añadiendo cosas al grafico definido tanto con una como con otra funcion.
+recomendamos ver <http://docs.ggplot2.org/0.9.3.1/index.html> para ver miles de ejemplos.
 
-
-Otro ejemplo partiendo de una gráfica creada con qplot, y como la podemos hacer con la función base ggplot:
+* ggplot(data, aes(x,y))
+*  `geom_point()` añade puntos
+*  `geom_bar()` añade grafico de barras
+*  `geom_ribbon(aes(ymin=level-1, ymax=level+1))` añade grafico de area
+*  `geom_abline(intercept = 37, slope = -5,colour = "red", size = 2)` añade una linea al grafico
+*  `geom_smooth(method = "lm")` añade curva de ajuste
+*  `geom_boxplot`  grafico de cajas
+*  `geom_segment`
+*  `facet_grid(. ~ variable)` añade paneles
+*  `facet_wrap(~variable)` añade paneles
+*  `labs(title = "titulo")` añade el titulo
+*  `labs(x = "titulo eje x", y = "tit eje y")` añade los titulos
+*  `theme_grey(base_family = "Avenir")` añade un tema basepuntos
 
 ```{r eval=FALSE}
 qplot(logpm25, NocturnalSympt, data = maacs, facets = . ~ bmicat, geom = c("point", "smooth"), method = "lm")
@@ -1019,6 +1126,7 @@ geom_point(aes(color = bmicat), alpha = 1/2, size = 4)
 # Change the background and font
 + theme_bw(base_family = "Avenir")
 ```
+
 ## PRACTICAS CON SWIRL
 Para realizar las prácticas con swirl, hacemos lo siguiente:
 
@@ -1032,29 +1140,15 @@ swirl()
 ```
 Todas las practicas de swirl están disponibles en GitHub: <https://github.com/DataScienceSpecialization/courses/>
 
-
-Hay 5 lecciones para el curso 4.
-
-1.    Principles of Analytic Graphs
-2.    Exploratory Graphs
-3.    Graphics Devices in R
-4.    Plotting Systems
-    Base Plotting System
-    
 ## RECURSOS EXTERNOS
 
 ### Graficos en R
 
 * [Muchos graficos con explicación](http://www.r-graph-gallery.com/portfolio/basics/)
+* [web de ejemplos de ggplot](http://docs.ggplot2.org/0.9.3.1/index.html)
 * [R graph gallery](gallery.r-enthusiasts.com)
-
 
 
 * [R Bloggers](http://www.r-bloggers.com/)
 * [www.edwardtufte.com](www.edwardtufte.com)
 
-
-## REPASO DE APPLY
-2=COL 1=FILAS
-apply(matriz,2,funcion)
-tapply(x,newClust,mean)
