@@ -77,7 +77,7 @@ To show the frecuency of the number of steps in a day, aggregate data by date (d
               geom="line",main= "day activity",
               facets = ~ date)
 ```
-
+![Total frecuency. Steps in a day](imag/plothist.png)
 
 ### Mean and median number of steps taken each day
 
@@ -192,18 +192,11 @@ We store the new data frame with this impute values and days in **impute_datos**
     #change data NA with average in impute data frame
     impute_datos<-datos
     impute_datos[is.na(impute_datos$steps),c('steps')]<-impute_datos1
-
-## for(i in 1:nrow(impute_datos)){
-##    if(is.na(impute_datos[i,]$steps)){
-##        impute_datos[i,]$steps <- getmedia(impute_datos[i,]$interval)
-##    }
-## }
-
 ```
 
 
 ### Histogram of the total number of steps taken each day after missing values are imputed
-As we didi before, we calculate the histogram for each data frame, separately, and paint tehn in the same plot.
+As we did before, we calculate the histogram for each data frame, separately, and paint tehn in the same plot.
 
 As we see the only difference (obvious) is the increase in the frequency of the average case (blue for impute data frame)
 
@@ -219,15 +212,6 @@ As we see the only difference (obvious) is the increase in the frequency of the 
     hist(res_day$steps,add=T,col=scales::alpha('red',.5),border=F, xlab="x")
         rug(res_day$steps,col = "red")
     legend("topright", c("impute", "original"), fill=c("skyblue", "red"))
-#    #png('imag/plothistnoNA.png')
-#        hist(res_dayNoNA$steps,col="wheat",
-#             main= "Total frecuency. Steps in a day",
-#             xlab="number of steps in a day" )
-#        rug(res_dayNoNA$steps,col = "blue")
-#    #dev.off()
-# summary(res_dayNoNA)
-
-
 ```
 
 ### Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
@@ -260,37 +244,3 @@ It seem in weekend we start later to walk.
 ### All of the R code needed to reproduce the results (numbers, plots, etc.) in the report
 
 This -.Rmd file is the compilation of the analysis and the results of the study.
-
-```{r eval=FALSE}
-library(dplyr)
-
-activityData <- read.csv("activity.csv")
-cleanData <- na.omit(activityData)
-
-
-dailyTotals <- cleanData %>% 
-               group_by(date) %>% 
-               summarize(number_of_steps_per_day = sum(steps)) %>% 
-               na.omit()
-
-hist(dailyTotals$number_of_steps_per_day)
-
-report <- dailyTotals %>% summarize(mean   = mean(number_of_steps_per_day),
-                                    median = median(number_of_steps_per_day))
-
-print(report)
-
-#What is the average daily activity pattern?
-
-timeSeries <- cleanData %>%
-              group_by(interval) %>%
-              summarize(average = mean(steps))
-
-p <- ggplot(timeSeries, aes(interval, average)) + 
-     geom_line() +
-     ylab("Steps Average") + 
-     xlab("Daily Intervals")
-
-print(p)
-```
-
