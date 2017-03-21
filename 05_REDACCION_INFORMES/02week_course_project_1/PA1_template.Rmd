@@ -77,7 +77,9 @@ To show the frecuency of the number of steps in a day, aggregate data by date (d
               geom="line",main= "day activity",
               facets = ~ date)
 ```
-![Total frecuency. Steps in a day](imag/plothist.png)
+![Total frecuency. Steps in a day](figure/plothist.png)
+
+![All days.time series](figure/multi_series.png)
 
 ### Mean and median number of steps taken each day
 
@@ -111,6 +113,7 @@ First we plot a daly time series of the sum of steps taken each day during the t
          col="gray",cex.axis = 0.6)
     axis(2,las=1,col="gray",cex.axis = 0.7)
 ```
+![Time serie of total steps by day](figure/tserie_steps.png)
 
 As we want to summarize a "normal" day, we take the mean of steps each **interval** for all days, and plot the result:
 
@@ -131,8 +134,8 @@ As we want to summarize a "normal" day, we take the mean of steps each **interva
     abline(v=maxInterval, col="blue",lwd=2, lty=3)
     # add text in max interval
     text(x=maxInterval+200, y=200, label="8:35 max step interval", cex = 0.6, col="blue")
-    
 ```
+![Average total steps by 5 min interval](figure/t_steps_day.png)
 
 ### The 5-minute interval that, on average, contains the maximum number of steps
 
@@ -213,6 +216,7 @@ As we see the only difference (obvious) is the increase in the frequency of the 
         rug(res_day$steps,col = "red")
     legend("topright", c("impute", "original"), fill=c("skyblue", "red"))
 ```
+![compare date and impute data histograms](figura/2histograms.png)
 
 ### Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
@@ -238,6 +242,8 @@ I decided not to chose impute data.
               fill=diasem)
     #dev.off()
 ```
+
+![weekdays and weekends](figura/weekend.png)
 
 It seem in weekend we start later to walk.
 
