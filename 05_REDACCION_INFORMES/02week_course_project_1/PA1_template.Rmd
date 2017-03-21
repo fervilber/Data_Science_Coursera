@@ -216,7 +216,7 @@ As we see the only difference (obvious) is the increase in the frequency of the 
         rug(res_day$steps,col = "red")
     legend("topright", c("impute", "original"), fill=c("skyblue", "red"))
 ```
-![compare date and impute data histograms](figura/2histograms.png)
+![compare date and impute data histograms](figure/2histograms.png)
 
 ### Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
@@ -243,7 +243,7 @@ I decided not to chose impute data.
     #dev.off()
 ```
 
-![weekdays and weekends](figura/weekend.png)
+![weekdays and weekends](figure/weekend.png)
 
 It seem in weekend we start later to walk.
 
